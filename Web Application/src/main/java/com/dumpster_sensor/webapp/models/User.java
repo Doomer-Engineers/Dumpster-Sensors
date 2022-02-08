@@ -3,7 +3,7 @@ package com.dumpster_sensor.webapp.models;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "users")
+@Table(name = "user")
 
 public class User {
     //Model in MVC.

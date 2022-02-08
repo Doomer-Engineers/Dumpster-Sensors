@@ -6,7 +6,7 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 public class DumpsterSensorController {
-    
+
     @Autowired
     private UserRepo uRepo;
 
