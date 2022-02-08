@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface SensorRepo extends JpaRepository<Sensor,Long> {
 
-    //search query for username
+    //search query for id
     @Query("SELECT s FROM Sensor s WHERE s.id = ?1")
     com.dumpster_sensor.webapp.models.Sensor findByID(Long id);
 }
