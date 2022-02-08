@@ -18,12 +18,12 @@ public class Sensor {
     @Column(nullable = false, length = 45)
     private String location;
 
-    @Column(nullable = true, length = 45)
+    @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private java.util.Date time1;
 
-    @Column(nullable = true, length = 45)
+    @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private java.util.Date time2;
@@ -35,7 +35,7 @@ public class Sensor {
     @Column
     private String power;
 
-    @Column(nullable = true, length = 45)
+    @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private java.util.Date lastUpdated;
