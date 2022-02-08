@@ -36,12 +36,12 @@ public class Alert {
         this.error = error;
     }
 
-    public Long getSensor_id() {
-        return sensor_id;
+    public Long getSensorID() {
+        return sensorID;
     }
 
-    public void setSensor_id(Long sensor_id) {
-        this.sensor_id = sensor_id;
+    public void setSensorID(Long sensorID) {
+        this.sensorID= sensorID;
     }
 
     public boolean isArchived() {
