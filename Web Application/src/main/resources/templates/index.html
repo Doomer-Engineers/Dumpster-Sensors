@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Index - DS</title>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/css/bootstrap.min.css"/>
+</head>
+<body class="p-3 mb-2 bg-dark text-white">
+<div class="container text-center">
+    <div>
+        <h1>Welcome to DOOMER ENGINEER'S DOODLE POOL!</h1>
+    </div>
+    <div>
+        <h3><a th:href="@{/addUser}">Add User</a></h3>
+        <h3><a th:href="@{/login}">Login</a></h3>
+        <h3><a th:href="@{/homepage}">Homepage</a></h3>
+    </div>
+</div>
+</body>
+</html>
