@@ -1,5 +1,6 @@
 package com.dumpster_sensor.webapp;
 
+import com.dumpster_sensor.webapp.models.Sensor;
 import com.dumpster_sensor.webapp.models.User;
 import com.dumpster_sensor.webapp.queries.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +37,10 @@ public class DumpsterSensorController {
 
     //model attributes to be placed on page..
     @ModelAttribute("user")
-    public User userDto() {
-        return new User();
-    }
+    public User userDTO() { return new User(); }
+
+    @ModelAttribute("sensor")
+    public Sensor sensorDTO() { return new Sensor(); }
 
     @ModelAttribute("uvp")
     public PasswordValidator pwDto() { return new PasswordValidator(); }
@@ -147,6 +149,32 @@ public class DumpsterSensorController {
     @GetMapping("/addSensor")
     public String getAddSensor(){
         return "addSensor";
+    }
+
+    @PostMapping("/addSensor")
+    public String addSensor(@ModelAttribute("sensor") Sensor sensor, Model model){
+        int errors = 0;
+        if (sensor.getTime1().equals(sensor.getTime2())){
+            model.addAttribute("timeErrorE", "The two selected times cannot be equal");
+            errors++;
+        }
+
+        List<Sensor> sensors =  sRepo.findAll();
+        for (Sensor value : sensors) {
+            if (value.getTime1().equals(sensor.getTime1()) || value.getTime2().equals(sensor.getTime1())) {
+                model.addAttribute("timeError1", "Selected time is currently in use");
+                errors++;
+            }
+            if (value.getTime1().equals(sensor.getTime2()) || value.getTime2().equals(sensor.getTime2())) {
+                model.addAttribute("timeError2", "Selected time is currently in use");
+                errors++;
+            }
+        }
+        if (errors > 0){
+            return "addSensor";
+        }
+        sRepo.save(sensor);
+        return "redirect:/homepage";
     }
 
 }

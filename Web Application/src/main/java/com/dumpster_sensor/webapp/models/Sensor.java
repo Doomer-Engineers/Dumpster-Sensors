@@ -19,26 +19,35 @@ public class Sensor {
     private String location;
 
     @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-    private java.util.Date time1;
+    private String time1;
 
     @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-    private java.util.Date time2;
+    private String time2;
 
-    @Column
-    private boolean installed;
+    @Column(nullable = false, length = 45)
+    private String installed;
 
     //not sure if this needs to be a string but for now it is a string
     @Column
     private String power;
 
-    @Column(nullable = false)
+    @Column
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private java.util.Date lastUpdated;
+
+    public Sensor() {
+    }
+
+    public Sensor(Long id, String location, String time1, String time2, String installed, String power, Date lastUpdated) {
+        this.id = id;
+        this.location = location;
+        this.time1 = time1;
+        this.time2 = time2;
+        this.installed = installed;
+        this.power = power;
+        this.lastUpdated = lastUpdated;
+    }
 
     public Long getId() {
         return id;
@@ -56,27 +65,27 @@ public class Sensor {
         this.location = location;
     }
 
-    public Date getTime1() {
+    public String getTime1() {
         return time1;
     }
 
-    public void setTime1(Date time1) {
+    public void setTime1(String time1) {
         this.time1 = time1;
     }
 
-    public Date getTime2() {
+    public String getTime2() {
         return time2;
     }
 
-    public void setTime2(Date time2) {
+    public void setTime2(String time2) {
         this.time2 = time2;
     }
 
-    public boolean isInstalled() {
+    public String getInstalled() {
         return installed;
     }
 
-    public void setInstalled(boolean installed) {
+    public void setInstalled(String installed) {
         this.installed = installed;
     }
 
