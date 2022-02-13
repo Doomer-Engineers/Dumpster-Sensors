@@ -17,4 +17,6 @@ public interface UserRepo extends JpaRepository<User,Long> {
     //search query for email
     @Query("SELECT u FROM User u WHERE u.email = ?1")
     com.dumpster_sensor.webapp.models.User findByEmail(String email);
+
+
 }

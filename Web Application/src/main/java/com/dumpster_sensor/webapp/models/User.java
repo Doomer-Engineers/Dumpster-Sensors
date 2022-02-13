@@ -26,6 +26,17 @@ public class User {
     @Column(nullable = false, length = 45)
     private String email;
 
+    public User(Long id, String role, String username, String password, String email) {
+        this.id = id;
+        this.role = role;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
+
+    public User() {
+    }
+
     public Long getId() {
         return id;
     }

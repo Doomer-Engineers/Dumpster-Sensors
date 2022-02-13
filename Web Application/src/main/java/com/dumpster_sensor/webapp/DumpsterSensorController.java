@@ -10,7 +10,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import java.text.ParseException;
+import java.util.List;
 
 @Controller
 public class DumpsterSensorController {
@@ -39,21 +43,39 @@ public class DumpsterSensorController {
     @ModelAttribute("uvp")
     public PasswordValidator pwDto() { return new PasswordValidator(); }
 
+    public User getLoggedInUser(){
+        String username;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails)principal).getUsername();
+        } else {
+            username = principal.toString();
+        }
+        return uRepo.findByUsername(username);
+    }
 
     //Processes GET and POST requests
     //Does UPDATE and PUT inside GETs and POSTs
 
-
     @GetMapping("/")
     public String defaultRequest(){
-        return "redirect:/index";
+        return "redirect:/login";
     }
 
+    // used during developmemt
+    // need to delete later
     @GetMapping("/index")
     public String getIndex() {return "index";}
 
     @GetMapping("/addUser")
-    public String getAddUser() {return "addUser";}
+    public String getAddUser() {
+        //restricts role access
+        User currentUser = getLoggedInUser();
+        if (currentUser.getRole().equals("general")){
+            return "homepage";
+        }
+        return "addUser";
+    }
 
     @PostMapping("/addUser")
     public String processRegistration(@ModelAttribute("user") User user, Model model, @ModelAttribute("uvp") PasswordValidator uvp){
@@ -82,7 +104,7 @@ public class DumpsterSensorController {
             model.addAttribute("pwError", "Password fields do not match.");
             errorCounter++;
         }
-        
+
         if (errorCounter > 0){
             return "addUser";
         }
@@ -95,20 +117,36 @@ public class DumpsterSensorController {
         return "redirect:/homepage";
     }
 
-    //Might be nice later to get logged in user for verification..
-    public User getLoggedInUser(){
-        String username;
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails)principal).getUsername();
-        } else {
-            username = principal.toString();
+    @GetMapping("/deleteUsers")
+    public String getDeleteUsers(Model model) {
+        //restricts role access
+        User currentUser = getLoggedInUser();
+        if (currentUser.getRole().equals("general")){
+            return "homepage";
         }
-        return uRepo.findByUsername(username);
+        List<User> users = uRepo.findAll();
+        model.addAttribute("users", users);
+        return "deleteUsers";
     }
 
+    @PostMapping(("/user/{id}/delete"))
+    public String deleteUser(Model model, @PathVariable(value = "id") Long id){
+        uRepo.deleteById(id);
+        List<User> users = uRepo.findAll();
+        model.addAttribute("users", users);
+        return "deleteUsers";
+    }
 
     @GetMapping("/homepage")
-    public String getHomepage() {return "homepage";}
+    public String getHomepage(Model model) {
+        User currentUser = getLoggedInUser();
+        model.addAttribute("user", currentUser);
+        return "homepage";
+    }
+
+    @GetMapping("/addSensor")
+    public String getAddSensor(){
+        return "addSensor";
+    }
 
 }
