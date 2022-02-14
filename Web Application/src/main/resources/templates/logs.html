@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Logs</title>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/css/bootstrap.min.css"/>
+</head>
+<body class="p-3 mb-2 bg-dark text-white">
+<div class="container text-center">
+    <table class="table table-striped table-bordered bg-secondary text-dark rounded">
+        <thead class="thread-dark">
+        <tr>
+            <th>ID</th>
+            <th>Sensor ID</th>
+            <th>Error</th>
+            <th>Archive</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="alert: ${alerts}" th:if="${alert.isArchived()} == false">
+
+            <td th:text="${alert.getId()}"></td>
+            <td th:text="${alert.getSensorID()}"></td>
+            <td th:text="${alert.getError()}"></td>
+            <td>
+                <form th:action="@{'/log/' + ${alert.getId()} + '/archive'}" method="post">
+                    <div>
+                        <button class="btn btn-warning" type="submit">Archive</button>
+                    </div>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class = "py-2">
+        <form th:action="@{'/homepage'}" method="get">
+            <div>
+                <button type="submit" class="btn btn-primary">Back</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

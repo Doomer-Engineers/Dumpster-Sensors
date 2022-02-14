@@ -20,6 +20,16 @@ public class Alert {
     @Column(nullable = false)
     private boolean archived;
 
+    public Alert() {
+    }
+
+    public Alert(Long id, String error, Long sensorID, boolean archived) {
+        this.id = id;
+        this.error = error;
+        this.sensorID = sensorID;
+        this.archived = archived;
+    }
+
     public Long getId() {
         return id;
     }

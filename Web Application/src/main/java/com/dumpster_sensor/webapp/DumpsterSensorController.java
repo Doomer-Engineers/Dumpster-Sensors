@@ -1,5 +1,6 @@
 package com.dumpster_sensor.webapp;
 
+import com.dumpster_sensor.webapp.models.Alert;
 import com.dumpster_sensor.webapp.models.Sensor;
 import com.dumpster_sensor.webapp.models.User;
 import com.dumpster_sensor.webapp.queries.*;
@@ -176,5 +177,25 @@ public class DumpsterSensorController {
         sRepo.save(sensor);
         return "redirect:/homepage";
     }
+
+
+    @GetMapping("/logs")
+    public String getLogs(Model model){
+        List<Alert> alerts = aRepo.findAll();
+        model.addAttribute("alerts",alerts);
+        return "logs";
+    }
+
+    @PostMapping("/log/{id}/archive")
+    public String archiveLog(@PathVariable(value = "id") Long id, Model model) {
+        Alert alert = aRepo.findByID(id);
+        alert.setArchived(true);
+        aRepo.save(alert);
+        List<Alert> alerts = aRepo.findAll();
+        model.addAttribute("alerts",alerts);
+        return "logs";
+    }
+
+    
 
 }
