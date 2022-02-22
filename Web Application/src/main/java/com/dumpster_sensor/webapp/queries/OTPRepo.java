@@ -14,4 +14,8 @@ public interface OTPRepo extends JpaRepository<OTP,Long> {
     @Query("SELECT o FROM OTP o WHERE o.userID = ?1")
     com.dumpster_sensor.webapp.models.OTP findByUserID(Long id);
 
+    //search query for otp
+    @Query("SELECT o FROM OTP o WHERE o.otp = ?1")
+    com.dumpster_sensor.webapp.models.OTP findByOTP(int otp);
+
 }

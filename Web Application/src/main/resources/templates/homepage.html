@@ -10,14 +10,14 @@
     <div class="row">
         <div class="mt-5 py-5 col-2">
             <div class="mt-5 py-5">
-                <h3><a th:href="@{/findSensor}">Find Sensor</a></h3>
+                <h3><a th:href="@{/find/sensor}">Find Sensor</a></h3>
                 <h3><a th:href="@{/addSensor}">Add Sensor</a></h3>
                 <h3><a th:href="@{/logs}">View Alerts</a></h3>
                 <div th:if="${user.getRole() == 'admin'}">
                     <h3><a th:href="@{/addUser}">Add User</a></h3>
                     <h3><a th:href="@{/deleteUsers}">Delete Users</a></h3>
                 </div>
-                <h3><a th:href="@{/changePassword}">Change Password</a></h3>
+                <h3><a th:href="@{/user/change_password}">Change Password</a></h3>
                 <h3><a th:href="@{/logout}">Logout</a></h3>
             </div>
         </div>

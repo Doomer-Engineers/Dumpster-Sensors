@@ -13,7 +13,7 @@
             <th>ID</th>
             <th>Sensor ID</th>
             <th>Error</th>
-            <th>Archive</th>
+            <th th:if="${user.getRole()} == 'admin'" >Archive</th>
         </tr>
         </thead>
         <tbody>
@@ -22,7 +22,7 @@
             <td th:text="${alert.getId()}"></td>
             <td th:text="${alert.getSensorID()}"></td>
             <td th:text="${alert.getError()}"></td>
-            <td>
+            <td th:if="${user.getRole()} == 'admin'">
                 <form th:action="@{'/log/' + ${alert.getId()} + '/archive'}" method="post">
                     <div>
                         <button class="btn btn-warning" type="submit">Archive</button>

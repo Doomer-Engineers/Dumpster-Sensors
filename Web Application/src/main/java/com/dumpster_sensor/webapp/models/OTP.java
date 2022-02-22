@@ -15,10 +15,23 @@ public class OTP {
     private int otp;
 
     @Column(nullable = false)
-    private boolean expired;
+    private String expired;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private Long userID;
+
+    public OTP(int otp, String expired, Long userID) {
+        this.otp = otp;
+        this.expired = expired;
+        this.userID = userID;
+    }
+
+    public OTP(int otp, String expired) {
+        this.otp = otp;
+        this.expired = expired;
+    }
+
+    public OTP() {}
 
     public Long getId() {
         return id;
@@ -36,11 +49,11 @@ public class OTP {
         this.otp = otp;
     }
 
-    public boolean isExpired() {
+    public String getExpired() {
         return expired;
     }
 
-    public void setExpired(boolean expired) {
+    public void setExpired(String expired) {
         this.expired = expired;
     }
 

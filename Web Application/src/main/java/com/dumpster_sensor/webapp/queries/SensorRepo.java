@@ -9,4 +9,8 @@ public interface SensorRepo extends JpaRepository<Sensor,Long> {
     //search query for id
     @Query("SELECT s FROM Sensor s WHERE s.id = ?1")
     com.dumpster_sensor.webapp.models.Sensor findByID(Long id);
+
+    //search query for location
+    @Query("SELECT s FROM Sensor s WHERE s.location = ?1")
+    com.dumpster_sensor.webapp.models.Sensor findByLocation(String location);
 }

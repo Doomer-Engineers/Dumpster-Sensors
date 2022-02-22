@@ -1,6 +1,7 @@
 package com.dumpster_sensor.webapp;
 
 import com.dumpster_sensor.webapp.models.Alert;
+import com.dumpster_sensor.webapp.models.OTP;
 import com.dumpster_sensor.webapp.models.Sensor;
 import com.dumpster_sensor.webapp.models.User;
 import com.dumpster_sensor.webapp.queries.*;
@@ -15,8 +16,16 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.Random;
 
 @Controller
 public class DumpsterSensorController {
@@ -55,6 +64,63 @@ public class DumpsterSensorController {
             username = principal.toString();
         }
         return uRepo.findByUsername(username);
+    }
+
+    //to send email
+    public void sendEmail(String email, String subject, String body){
+        //Sender's email ID needs to be mentioned.
+        String from = "doomerengineers@gmail.com";
+
+        //Assuming you are sending email from through gmails smtp.
+        String host = "smtp.gmail.com";
+
+        //Get system properties.
+        Properties properties = System.getProperties();
+
+        //Setup mail server
+        properties.put("mail.smtp.host", host);
+        properties.put("mail.smtp.port", "465");
+        properties.put("mail.smtp.ssl.enable", "true");
+        properties.put("mail.smtp.auth", "true");
+
+        //Get the Session object.// and pass username and password.
+        Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
+
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+
+                return new PasswordAuthentication("doomerengineers@gmail.com", "Taco9876");
+
+            }
+
+        });
+
+        //Used to debug SMTP issues.
+        session.setDebug(true);
+
+        try {
+            //Create a default MimeMessage object.
+            MimeMessage message = new MimeMessage(session);
+
+            //Set From: header field of the header.
+            message.setFrom(new InternetAddress(from));
+
+            //Set To: header field of the header.
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
+
+            //Set Subject: header field.
+            message.setSubject(subject);
+
+            //Now set the actual message.
+            message.setText(body);
+
+            System.out.println("sending...");
+            //Send message.
+            Transport.send(message);
+            System.out.println("Sent message successfully....");
+        } catch (MessagingException mex) {
+            mex.printStackTrace();
+        }
     }
 
     //Processes GET and POST requests
@@ -113,10 +179,77 @@ public class DumpsterSensorController {
         }
 
         //encodes password as a fixed hash function
+        String tmpPass = user.getPassword();
+
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String encodedPassword = encoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         uRepo.save(user);
+        String subject = "Your Dumpster Sensor for UI account has been created";
+        String message = "An admin for this system has created your new account.\n\nYour username is: " + user.getUsername() + "\nYour password is: " + tmpPass + "\nPlease change your password as soon as you login.\n\nThank You,\nDoomer Engineers";
+        sendEmail(user.getEmail(),subject, message);
+        return "redirect:/homepage";
+    }
+
+    @GetMapping("/user/change_password")
+    public String getOTP(@ModelAttribute("otp") OTP otp, Model model) {
+        User currentUser = getLoggedInUser();
+
+        Random rand = new Random();
+        int upperbound = 10000000;
+        int otpNum = 0;
+
+        boolean check = false;
+        while(!check){
+            otpNum = rand.nextInt(upperbound);
+            if (oRepo.findByOTP(otpNum) == null){
+                check = true;
+            }
+        }
+
+        LocalDateTime now = LocalDateTime.now().plusMinutes(5);
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        OTP temp = oRepo.findByUserID(currentUser.getId());
+        if (temp == null){
+            OTP temp2 = new OTP(otpNum, now.format(dtf), currentUser.getId());
+            oRepo.save(temp2);
+            String subject = "Here is your one time password";
+            String message = "Your one time password expires in less then five minutes.\n\nIt is: " + otpNum;
+            sendEmail(currentUser.getEmail(),subject,message);
+        }
+        else{
+            temp.setOtp(otpNum);
+            temp.setExpired(now.format(dtf));
+            oRepo.save(temp);
+            String subject = "Here is your one time password";
+            String message = "Your one time password expires in less then five minutes.\n\nIt is: " + otpNum;
+            sendEmail(currentUser.getEmail(),subject,message);
+        }
+
+        model.addAttribute("otp",otp);
+        return "otpPage";
+    }
+
+    @PostMapping("/user/change_password/otp")
+    public String checkOTP(@ModelAttribute("otp") OTP otp, Model model) {
+        User currentUser = getLoggedInUser();
+        LocalDateTime now = LocalDateTime.now();
+
+        OTP currentUserOTP = oRepo.findByUserID(currentUser.getId());
+        if (currentUserOTP.getOtp() != otp.getOtp()){
+            model.addAttribute("wrongOTP", "Your OTP was incorrect.");
+            return "otpPage";
+        }
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime checkDate = LocalDateTime.parse(currentUserOTP.getExpired(),dtf);
+
+        if(now.isAfter(checkDate)){
+            model.addAttribute("expiredOTP", "Your OTP was expired.");
+            return "otpPage";
+        }
+
         return "redirect:/homepage";
     }
 
@@ -170,10 +303,16 @@ public class DumpsterSensorController {
                 model.addAttribute("timeError2", "Selected time is currently in use");
                 errors++;
             }
+            if (value.getLocation().equals(sensor.getLocation())) {
+                model.addAttribute("locationError", "Location is already in use");
+                errors++;
+            }
         }
         if (errors > 0){
             return "addSensor";
         }
+        String location = sensor.getLocation().toLowerCase();
+        sensor.setLocation(location);
         sRepo.save(sensor);
         return "redirect:/homepage";
     }
@@ -182,7 +321,9 @@ public class DumpsterSensorController {
     @GetMapping("/logs")
     public String getLogs(Model model){
         List<Alert> alerts = aRepo.findAll();
+        User user = getLoggedInUser();
         model.addAttribute("alerts",alerts);
+        model.addAttribute("user", user);
         return "logs";
     }
 
@@ -196,6 +337,39 @@ public class DumpsterSensorController {
         return "logs";
     }
 
-    
+    @GetMapping("/find/sensor")
+    public String findSensor(@ModelAttribute("sensor") Sensor sensor, Model model){
+        model.addAttribute("sensor", sensor);
+        return "findSensor";
+    }
+
+    @PostMapping("/find/sensor/submit")
+    public String findSensorByLocation(@ModelAttribute("sensor") Sensor sensor, Model model){
+        final String message = "Requested poll is not found";
+        Sensor temp;
+        if(sensor.getLocation() != null){
+            temp = sRepo.findByLocation(sensor.getLocation());
+        }
+        else{
+            temp = sRepo.findByID(sensor.getId());
+        }
+        if (temp == null) {
+            model.addAttribute("error", message);
+            return "findSensor";
+        }
+        else{
+            return "redirect:/sensor/update/" + temp.getId();
+        }
+    }
+
+    @GetMapping("/sensor/update/{id}")
+    public String getUpdateSensor(@PathVariable(value="id") Long id, Model model){
+        Sensor sensor = sRepo.findByID(id);
+        model.addAttribute("sensor", sensor);
+        return "getSensor";
+    }
+
+
+
 
 }
