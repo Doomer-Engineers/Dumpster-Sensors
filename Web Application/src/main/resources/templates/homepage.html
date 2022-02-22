@@ -15,7 +15,7 @@
                 <h3><a th:href="@{/logs}">View Alerts</a></h3>
                 <div th:if="${user.getRole() == 'admin'}">
                     <h3><a th:href="@{/addUser}">Add User</a></h3>
-                    <h3><a th:href="@{/deleteUsers}">Delete Users</a></h3>
+                    <h3><a th:href="@{/users/update}">Update Users</a></h3>
                 </div>
                 <h3><a th:href="@{/user/change_password}">Change Password</a></h3>
                 <h3><a th:href="@{/logout}">Logout</a></h3>
