@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" lang="en">
+<head lang="en">
+    <meta charset="UTF-8"/>
+    <title>SignUp</title>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/css/bootstrap.min.css"/>
+</head>
+<body class="p-3 mb-2 bg-dark text-white">
+<div class="container text-center">
+    <div>
+        <h1>Update User</h1>
+    </div>
+    <form th:action="@{'/user/'+ ${user.id} + '/update'}" method="post"
+          style="max-width: 600px; margin: 0 auto;"
+    >
+        <div class="m-3">
+            <div class="form-group row">
+                <label class="col-form-label col-4"></label>
+                <div class="">
+                    <div th:if="${wrongEmail != null}" class="alert alert-danger notification" role="alert">
+                        <p  th:text="${wrongEmail}"></p><p> is not an UIowa email</p>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-form-label col-4">Email</label>
+                <div class="">
+                    <label>
+                        <input type="email" class="form-control" th:field="${user.email}" required/>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-form-label col-4">Role</label>
+                <div class="">
+                    <label>
+                        <select class="form-control" th:field="${user.role}" required>
+                            <option value=""></option>
+                            <option th:value="'general'" th:text="General"></option>
+                            <option th:value="'admin'" th:text="Admin"></option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+        </div>
+    </form>
+    <a th:href = "@{'/users/update'}">Cancel</a>
+</div>
+
+</body>
+</html>

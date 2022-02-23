@@ -14,16 +14,32 @@
                 <th>Username</th>
                 <th>Email</th>
                 <th>Role</th>
+                <th>Recover</th>
+                <th>Update</th>
                 <th>Delete</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="user: ${users}">
+            <tr th:each="user: ${users}" th:if="${user.getId()} != ${currentUser.getId()}" >
 
                 <td th:text="${user.getId()}">ID</td>
                 <td th:text="${user.getUsername()}">Username</td>
                 <td th:text="${user.getEmail()}">Email</td>
                 <td th:text="${user.getRole()}">Role</td>
+                <td>
+                    <form th:action="@{'/user/' + ${user.getId()} + '/recover'}" method="get">
+                        <div>
+                            <button class="btn btn-info" type="submit">Recover</button>
+                        </div>
+                    </form>
+                </td>
+                <td>
+                    <form th:action="@{'/user/' + ${user.getId()} + '/update'}" method="get">
+                        <div>
+                            <button class="btn btn-success" type="submit">Update</button>
+                        </div>
+                    </form>
+                </td>
                 <td>
                     <form th:action="@{'/user/' + ${user.getId()} + '/delete'}" method="post">
                         <div>

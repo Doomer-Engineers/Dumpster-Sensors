@@ -122,6 +122,28 @@ public class DumpsterSensorController {
         }
     }
 
+    private Pair<Integer, Model> getErrorCounterAndModel(@ModelAttribute("user") User user, @ModelAttribute("uvp") PasswordValidator uvp, Model model, int errorCounter) {
+        if(uvp.hasErrors(user.getPassword()) && user.getPassword() != null){
+            //error checks if password has errors.
+            model.addAttribute("errors", uvp.getErrors());
+            errorCounter++;
+        }
+        if(!user.getPassword().equals(uvp.getCheckPW())){
+            //error checks if password verification has errors.
+            model.addAttribute("pwError", "Password fields do not match.");
+            errorCounter++;
+        }
+        return Pair.of(errorCounter, model);
+    }
+
+    private void updatePassword(User user, String encoded){
+        user.setPassword(encoded);
+        uRepo.save(user);
+        String subject = "Your Dumpster Sensor Password has been updated";
+        String message = "Your password has been updated.\nPlease contact an admin if this was not you.\n\nThank You,\nDoomer Engineers";
+        sendEmail(user.getEmail(),subject, message);
+    }
+
     //Processes GET and POST requests
     //Does UPDATE and PUT inside GETs and POSTs
 
@@ -162,7 +184,7 @@ public class DumpsterSensorController {
             model.addAttribute("wrongEmail", user.getEmail());
             errorCounter++;
         }
-        Pair<Integer, Model> pair = getErrorCounter(user, uvp, model, errorCounter);
+        Pair<Integer, Model> pair = getErrorCounterAndModel(user, uvp, model, errorCounter);
         if (pair.getFirst() > 0){
             model.addAttribute(pair.getSecond());
             return "addUser";
@@ -176,7 +198,7 @@ public class DumpsterSensorController {
         user.setPassword(encodedPassword);
         uRepo.save(user);
         String subject = "Your Dumpster Sensor for UI account has been created";
-        String message = "An admin for this system has created your new account.\n\nYour username is: " + user.getUsername() + "\nYour password is: " + tmpPass + "\nPlease change your password as soon as you login.\n\nThank You,\nDoomer Engineers";
+        String message = "An admin for this system has created your new account.\n\nYour username is: " + user.getUsername() + "\nYour password is: " + tmpPass + "\nPlease change your password as soon as you login.\nPlease also whitelist this email.\n\nThank You,\nDoomer Engineers";
         sendEmail(user.getEmail(),subject, message);
         return "redirect:/homepage";
     }
@@ -253,7 +275,7 @@ public class DumpsterSensorController {
 
     @PostMapping("/user/change_password/authenticated/confirm")
     public String validatePasswordChange(@ModelAttribute("user") User user, @ModelAttribute("uvp") PasswordValidator uvp, Model model){
-        Pair<Integer, Model> pair = getErrorCounter(user, uvp, model, 0);
+        Pair<Integer, Model> pair = getErrorCounterAndModel(user, uvp, model, 0);
         if (pair.getFirst() > 0){
             model.addAttribute(pair.getSecond());
             return "updatePassword";
@@ -263,28 +285,15 @@ public class DumpsterSensorController {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String encodedPassword = encoder.encode(user.getPassword());
         User currentUser = getLoggedInUser();
-        currentUser.setPassword(encodedPassword);
-        uRepo.save(currentUser);
-
-        String subject = "Your Dumpster Sensor Password has been updated";
-        String message = "Your password has been updated.\nPlease contact an admin if this was not you.\n\nThank You,\nDoomer Engineers";
-        sendEmail(currentUser.getEmail(),subject, message);
+        if(user.getId().equals(currentUser.getId())){
+            updatePassword(currentUser, encodedPassword);
+        }
+        else{
+            updatePassword(user, encodedPassword);
+        }
         return "redirect:/homepage";
     }
 
-    private Pair<Integer, Model> getErrorCounter(@ModelAttribute("user") User user, @ModelAttribute("uvp") PasswordValidator uvp, Model model, int errorCounter) {
-        if(uvp.hasErrors(user.getPassword()) && user.getPassword() != null){
-            //error checks if password has errors.
-            model.addAttribute("errors", uvp.getErrors());
-            errorCounter++;
-        }
-        if(!user.getPassword().equals(uvp.getCheckPW())){
-            //error checks if password verification has errors.
-            model.addAttribute("pwError", "Password fields do not match.");
-            errorCounter++;
-        }
-        return Pair.of(errorCounter, model);
-    }
 
     @GetMapping("/users/update")
     public String getUpdateUsers(Model model) {
@@ -295,7 +304,8 @@ public class DumpsterSensorController {
         }
         List<User> users = uRepo.findAll();
         model.addAttribute("users", users);
-        return "updateUsers";
+        model.addAttribute("currentUser", currentUser);
+        return "updateUsersAdmin";
     }
 
     @PostMapping(("/user/{id}/delete"))
@@ -303,13 +313,44 @@ public class DumpsterSensorController {
         uRepo.deleteById(id);
         List<User> users = uRepo.findAll();
         model.addAttribute("users", users);
-        return "updateUsers";
+        return "updateUsersAdmin";
+    }
+
+    @GetMapping(("/user/{id}/recover"))
+    public String recoverPassword(Model model, @PathVariable(value = "id") Long id){
+        User user = uRepo.findByID(id);
+        user.setPassword("");
+        model.addAttribute("user", user);
+        return "updatePassword";
+    }
+
+    @GetMapping(("/user/{id}/update"))
+    public String updateUser(Model model, @PathVariable(value = "id") Long id){
+        User user = uRepo.findByID(id);
+        model.addAttribute("user", user);
+        return "updateUser";
+    }
+
+    @PostMapping(("/user/{id}/update"))
+    public String validateUpdateUser(Model model, @PathVariable(value = "id") Long id, @ModelAttribute("user") User user){
+        User userToUpdate = uRepo.findByID(id);
+        if(!user.getEmail().endsWith("uiowa.edu")){
+            //checks if email is an uiowa email address
+            model.addAttribute("wrongEmail", user.getEmail());
+            return "updateUser";
+        }
+        userToUpdate.setEmail(user.getEmail());
+        userToUpdate.setRole(user.getRole());
+        uRepo.save(userToUpdate);
+        return "redirect:/homepage";
     }
 
     @GetMapping("/homepage")
     public String getHomepage(Model model) {
         User currentUser = getLoggedInUser();
+        List<Sensor> sensors = sRepo.findAll().subList(0,3);
         model.addAttribute("user", currentUser);
+        model.addAttribute("sensors", sensors);
         return "homepage";
     }
 
@@ -336,7 +377,7 @@ public class DumpsterSensorController {
                 model.addAttribute("timeError2", "Selected time is currently in use");
                 errors++;
             }
-            if (value.getLocation().equals(sensor.getLocation())) {
+            if (value.getLocation().equalsIgnoreCase(sensor.getLocation())) {
                 model.addAttribute("locationError", "Location is already in use");
                 errors++;
             }
@@ -348,6 +389,13 @@ public class DumpsterSensorController {
         sensor.setLocation(location);
         sRepo.save(sensor);
         return "redirect:/homepage";
+    }
+
+    @GetMapping("/view/sensors")
+    public String getAllSensor(Model model){
+        List<Sensor> sensors = sRepo.findAll();
+        model.addAttribute("sensors", sensors);
+        return "viewSensors";
     }
 
 
