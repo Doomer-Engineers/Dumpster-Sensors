@@ -8,15 +8,15 @@ public interface UserRepo extends JpaRepository<User,Long> {
 
     //search query for username
     @Query("SELECT u FROM User u WHERE u.username = ?1")
-    com.dumpster_sensor.webapp.models.User findByUsername(String username);
+    User findByUsername(String username);
 
     //search query for id
     @Query("SELECT u FROM User u WHERE u.id = ?1")
-    com.dumpster_sensor.webapp.models.User findByID(Long username);
+    User findByID(Long username);
 
     //search query for email
     @Query("SELECT u FROM User u WHERE u.email = ?1")
-    com.dumpster_sensor.webapp.models.User findByEmail(String email);
+    User findByEmail(String email);
 
 
 }

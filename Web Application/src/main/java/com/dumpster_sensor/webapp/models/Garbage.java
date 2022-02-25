@@ -20,7 +20,40 @@ public class Garbage {
     private int garbageLevel;
 
     @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-    private java.util.Date time;
+    private String time;
+
+    public Garbage() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getSensorID() {
+        return sensorID;
+    }
+
+    public void setSensorID(Long sensorID) {
+        this.sensorID = sensorID;
+    }
+
+    public int getGarbageLevel() {
+        return garbageLevel;
+    }
+
+    public void setGarbageLevel(int garbageLevel) {
+        this.garbageLevel = garbageLevel;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
 }

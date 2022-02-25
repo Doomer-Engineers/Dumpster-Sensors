@@ -55,7 +55,7 @@
                 </div>
                 <div class="form-group row pl-5">
                     <label class="mr-4 pr-4" for="time1">Choose a time for your first reading:</label>
-                    <input class="mr-4" type="time" id="time1" name="time1" min="00:00" max="23:55" step="300" required>
+                    <input class="mr-4" th:field="*{time1}" type="time" id="time1" name="time1" min="00:00" max="23:55" step="300" required>
                     <small>*Availability occurs in 5 minute intervals</small>
                 </div>
                 <div class="form-group row">
@@ -68,12 +68,12 @@
                 </div>
                 <div class="form-group row pl-5">
                     <label class="mr-4" for="time2">Choose a time for your second reading:</label>
-                    <input class="mr-4" type="time" id="time2" name="time2" min="00:00" max="23:55" step="300" required>
+                    <input class="mr-4" th:field="*{time2}" type="time" id="time2" name="time2" min="00:00" max="23:55" step="300" required>
                     <small>*Availability occurs in 5 minute intervals</small>
                 </div>
 
                 <div>
-                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                    <button type="submit" class="btn btn-primary">Add Sensor</button>
                 </div>
             </div>
         </form>

@@ -1,9 +1,6 @@
 package com.dumpster_sensor.webapp;
 
-import com.dumpster_sensor.webapp.models.Alert;
-import com.dumpster_sensor.webapp.models.OTP;
-import com.dumpster_sensor.webapp.models.Sensor;
-import com.dumpster_sensor.webapp.models.User;
+import com.dumpster_sensor.webapp.models.*;
 import com.dumpster_sensor.webapp.queries.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -22,9 +19,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Properties;
-import java.util.Random;
+import java.util.*;
 
 @Controller
 public class DumpsterSensorController {
@@ -54,6 +49,10 @@ public class DumpsterSensorController {
     @ModelAttribute("uvp")
     public PasswordValidator pwDto() { return new PasswordValidator(); }
 
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final String HOME = "homepage";
+    private static final String REDIRECT_HOME ="redirect:/homepage";
+
     public User getLoggedInUser(){
         String username;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -70,7 +69,7 @@ public class DumpsterSensorController {
         //Sender's email ID needs to be mentioned.
         String from = "doomerengineers@gmail.com";
 
-        //Assuming you are sending email from through gmails smtp.
+        //Assuming you are sending email from through gmail smtp.
         String host = "smtp.gmail.com";
 
         //Get system properties.
@@ -113,16 +112,14 @@ public class DumpsterSensorController {
             //Now set the actual message.
             message.setText(body);
 
-            System.out.println("sending...");
             //Send message.
             Transport.send(message);
-            System.out.println("Sent message successfully....");
         } catch (MessagingException mex) {
             mex.printStackTrace();
         }
     }
 
-    private Pair<Integer, Model> getErrorCounterAndModel(@ModelAttribute("user") User user, @ModelAttribute("uvp") PasswordValidator uvp, Model model, int errorCounter) {
+    private Pair<Integer, Model> passwordErrorCounterAndModel(@ModelAttribute("user") User user, @ModelAttribute("uvp") PasswordValidator uvp, Model model, int errorCounter) {
         if(uvp.hasErrors(user.getPassword()) && user.getPassword() != null){
             //error checks if password has errors.
             model.addAttribute("errors", uvp.getErrors());
@@ -134,6 +131,33 @@ public class DumpsterSensorController {
             errorCounter++;
         }
         return Pair.of(errorCounter, model);
+    }
+
+    private  Pair<Integer, Model> sensorErrorCounterAndModel(@ModelAttribute("sensor") Sensor sensor, Model model, Long id) {
+        int errors = 0;
+        if (sensor.getTime1().equals(sensor.getTime2())) {
+            model.addAttribute("timeErrorE", "The two selected times cannot be equal");
+            errors++;
+        }
+
+        List<Sensor> sensors = sRepo.findAll();
+        for (Sensor value : sensors) {
+            if (!value.getId().equals(id)) {
+                if (value.getTime1().equals(sensor.getTime1()) || value.getTime2().equals(sensor.getTime1())) {
+                    model.addAttribute("timeError1", "Selected time is currently in use");
+                    errors++;
+                }
+                if (value.getTime1().equals(sensor.getTime2()) || value.getTime2().equals(sensor.getTime2())) {
+                    model.addAttribute("timeError2", "Selected time is currently in use");
+                    errors++;
+                }
+                if (value.getLocation().equalsIgnoreCase(sensor.getLocation())) {
+                    model.addAttribute("locationError", "Location is already in use");
+                    errors++;
+                }
+            }
+        }
+        return Pair.of(errors, model);
     }
 
     private void updatePassword(User user, String encoded){
@@ -152,21 +176,41 @@ public class DumpsterSensorController {
         return "redirect:/login";
     }
 
-    // used during developmemt
+    // used during development
     // need to delete later
     @GetMapping("/index")
     public String getIndex() {return "index";}
 
+    // Returns homepage
+    // Puts most recent updated sensor to model, up to 5.
+    @GetMapping("/homepage")
+    public String getHomepage(Model model) {
+        User currentUser = getLoggedInUser();
+        List<Sensor> sensors = sRepo.findAllOrderByLastUpdatedDesc();
+
+        if(sensors.size() < 5){
+            model.addAttribute("sensors", sensors.subList(0, sensors.size()));
+        }
+        else{
+            model.addAttribute("sensors", sensors.subList(0,5));
+        }
+        model.addAttribute("user", currentUser);
+        return HOME;
+    }
+
+    // returns new user page
     @GetMapping("/addUser")
     public String getAddUser() {
         //restricts role access
         User currentUser = getLoggedInUser();
         if (currentUser.getRole().equals("general")){
-            return "homepage";
+            return HOME;
         }
         return "addUser";
     }
 
+    //validates new user
+    //redirect to homepage
     @PostMapping("/addUser")
     public String processRegistration(@ModelAttribute("user") User user, Model model, @ModelAttribute("uvp") PasswordValidator uvp){
 
@@ -184,7 +228,7 @@ public class DumpsterSensorController {
             model.addAttribute("wrongEmail", user.getEmail());
             errorCounter++;
         }
-        Pair<Integer, Model> pair = getErrorCounterAndModel(user, uvp, model, errorCounter);
+        Pair<Integer, Model> pair = passwordErrorCounterAndModel(user, uvp, model, errorCounter);
         if (pair.getFirst() > 0){
             model.addAttribute(pair.getSecond());
             return "addUser";
@@ -200,9 +244,11 @@ public class DumpsterSensorController {
         String subject = "Your Dumpster Sensor for UI account has been created";
         String message = "An admin for this system has created your new account.\n\nYour username is: " + user.getUsername() + "\nYour password is: " + tmpPass + "\nPlease change your password as soon as you login.\nPlease also whitelist this email.\n\nThank You,\nDoomer Engineers";
         sendEmail(user.getEmail(),subject, message);
-        return "redirect:/homepage";
+        return REDIRECT_HOME;
     }
 
+    //get new otp page to change password
+    //generates a random value not already in the otp table
     @GetMapping("/user/change_password")
     public String getOTP(@ModelAttribute("otp") OTP otp, Model model) {
         User currentUser = getLoggedInUser();
@@ -220,11 +266,10 @@ public class DumpsterSensorController {
         }
 
         LocalDateTime now = LocalDateTime.now().plusMinutes(5);
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         OTP temp = oRepo.findByUserID(currentUser.getId());
         if (temp == null){
-            OTP temp2 = new OTP(otpNum, now.format(dtf), currentUser.getId());
+            OTP temp2 = new OTP(otpNum, now.format(DATE_TIME_FORMATTER), currentUser.getId());
             oRepo.save(temp2);
             String subject = "Here is your one time password";
             String message = "Your one time password expires in less then five minutes.\n\nIt is: " + otpNum;
@@ -232,7 +277,7 @@ public class DumpsterSensorController {
         }
         else{
             temp.setOtp(otpNum);
-            temp.setExpired(now.format(dtf));
+            temp.setExpired(now.format(DATE_TIME_FORMATTER));
             oRepo.save(temp);
             String subject = "Here is your one time password";
             String message = "Your one time password expires in less then five minutes.\n\nIt is: " + otpNum;
@@ -243,6 +288,8 @@ public class DumpsterSensorController {
         return "otpPage";
     }
 
+    //validates opt from user
+    //returns change password page
     @PostMapping("/user/change_password/otp")
     public String checkOTP(@ModelAttribute("otp") OTP otp, Model model) {
         User currentUser = getLoggedInUser();
@@ -254,8 +301,7 @@ public class DumpsterSensorController {
             return "otpPage";
         }
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime checkDate = LocalDateTime.parse(currentUserOTP.getExpired(),dtf);
+        LocalDateTime checkDate = LocalDateTime.parse(currentUserOTP.getExpired(),DATE_TIME_FORMATTER);
 
         if(now.isAfter(checkDate)){
             model.addAttribute("expiredOTP", "Your OTP was expired.");
@@ -265,6 +311,7 @@ public class DumpsterSensorController {
         return "redirect:/user/change_password/authenticated";
     }
 
+    //returns change password page
     @GetMapping("/user/change_password/authenticated")
     public String getPasswordChange(Model model){
         User user = getLoggedInUser();
@@ -273,9 +320,12 @@ public class DumpsterSensorController {
         return "updatePassword";
     }
 
+    //validates the changed password
+    //redirects to homepage once successful if not admin
+    //if admin, returns user admin page
     @PostMapping("/user/change_password/authenticated/confirm")
     public String validatePasswordChange(@ModelAttribute("user") User user, @ModelAttribute("uvp") PasswordValidator uvp, Model model){
-        Pair<Integer, Model> pair = getErrorCounterAndModel(user, uvp, model, 0);
+        Pair<Integer, Model> pair = passwordErrorCounterAndModel(user, uvp, model, 0);
         if (pair.getFirst() > 0){
             model.addAttribute(pair.getSecond());
             return "updatePassword";
@@ -287,20 +337,25 @@ public class DumpsterSensorController {
         User currentUser = getLoggedInUser();
         if(user.getId().equals(currentUser.getId())){
             updatePassword(currentUser, encodedPassword);
+            model.addAttribute("currentUser", currentUser);
+            List<User> users = uRepo.findAll();
+            model.addAttribute("users",users);
+            return "updateUsersAdmin";
         }
         else{
             updatePassword(user, encodedPassword);
         }
-        return "redirect:/homepage";
+        return REDIRECT_HOME;
     }
 
 
+    //returns update users from admin role
     @GetMapping("/users/update")
     public String getUpdateUsers(Model model) {
         //restricts role access
         User currentUser = getLoggedInUser();
         if (currentUser.getRole().equals("general")){
-            return "homepage";
+            return HOME;
         }
         List<User> users = uRepo.findAll();
         model.addAttribute("users", users);
@@ -308,6 +363,8 @@ public class DumpsterSensorController {
         return "updateUsersAdmin";
     }
 
+    //deletes a user
+    //returns update user admin page
     @PostMapping(("/user/{id}/delete"))
     public String deleteUser(Model model, @PathVariable(value = "id") Long id){
         uRepo.deleteById(id);
@@ -316,14 +373,19 @@ public class DumpsterSensorController {
         return "updateUsersAdmin";
     }
 
+    //allows an admin to reset a password
+    //returns update password page
     @GetMapping(("/user/{id}/recover"))
     public String recoverPassword(Model model, @PathVariable(value = "id") Long id){
         User user = uRepo.findByID(id);
         user.setPassword("");
         model.addAttribute("user", user);
+        model.addAttribute("currentUser", getLoggedInUser());
         return "updatePassword";
     }
 
+    //allows and admin to change pole and update email
+    //returns update user page
     @GetMapping(("/user/{id}/update"))
     public String updateUser(Model model, @PathVariable(value = "id") Long id){
         User user = uRepo.findByID(id);
@@ -331,6 +393,8 @@ public class DumpsterSensorController {
         return "updateUser";
     }
 
+    //validates user changes
+    //returns update user admin page
     @PostMapping(("/user/{id}/update"))
     public String validateUpdateUser(Model model, @PathVariable(value = "id") Long id, @ModelAttribute("user") User user){
         User userToUpdate = uRepo.findByID(id);
@@ -342,55 +406,35 @@ public class DumpsterSensorController {
         userToUpdate.setEmail(user.getEmail());
         userToUpdate.setRole(user.getRole());
         uRepo.save(userToUpdate);
-        return "redirect:/homepage";
+        List<User> users = uRepo.findAll();
+        model.addAttribute("users", users);
+        model.addAttribute("currentUser", getLoggedInUser());
+        return "updateUsersAdmin";
     }
 
-    @GetMapping("/homepage")
-    public String getHomepage(Model model) {
-        User currentUser = getLoggedInUser();
-        List<Sensor> sensors = sRepo.findAll().subList(0,3);
-        model.addAttribute("user", currentUser);
-        model.addAttribute("sensors", sensors);
-        return "homepage";
-    }
-
+    //gets add sensor page
     @GetMapping("/addSensor")
     public String getAddSensor(){
         return "addSensor";
     }
 
+    //validates new sensor
     @PostMapping("/addSensor")
     public String addSensor(@ModelAttribute("sensor") Sensor sensor, Model model){
-        int errors = 0;
-        if (sensor.getTime1().equals(sensor.getTime2())){
-            model.addAttribute("timeErrorE", "The two selected times cannot be equal");
-            errors++;
-        }
-
-        List<Sensor> sensors =  sRepo.findAll();
-        for (Sensor value : sensors) {
-            if (value.getTime1().equals(sensor.getTime1()) || value.getTime2().equals(sensor.getTime1())) {
-                model.addAttribute("timeError1", "Selected time is currently in use");
-                errors++;
-            }
-            if (value.getTime1().equals(sensor.getTime2()) || value.getTime2().equals(sensor.getTime2())) {
-                model.addAttribute("timeError2", "Selected time is currently in use");
-                errors++;
-            }
-            if (value.getLocation().equalsIgnoreCase(sensor.getLocation())) {
-                model.addAttribute("locationError", "Location is already in use");
-                errors++;
-            }
-        }
-        if (errors > 0){
+        Pair<Integer,Model> pair = sensorErrorCounterAndModel(sensor, model,0L);
+        if (pair.getFirst() > 0){
+            model.addAttribute(pair.getSecond());
             return "addSensor";
         }
         String location = sensor.getLocation().toLowerCase();
         sensor.setLocation(location);
+        LocalDateTime now = LocalDateTime.now();
+        sensor.setLastUpdated(now.format(DATE_TIME_FORMATTER));
         sRepo.save(sensor);
-        return "redirect:/homepage";
+        return REDIRECT_HOME;
     }
 
+    //allows a user to view all sensors
     @GetMapping("/view/sensors")
     public String getAllSensor(Model model){
         List<Sensor> sensors = sRepo.findAll();
@@ -398,32 +442,14 @@ public class DumpsterSensorController {
         return "viewSensors";
     }
 
-
-    @GetMapping("/logs")
-    public String getLogs(Model model){
-        List<Alert> alerts = aRepo.findAll();
-        User user = getLoggedInUser();
-        model.addAttribute("alerts",alerts);
-        model.addAttribute("user", user);
-        return "logs";
-    }
-
-    @PostMapping("/log/{id}/archive")
-    public String archiveLog(@PathVariable(value = "id") Long id, Model model) {
-        Alert alert = aRepo.findByID(id);
-        alert.setArchived(true);
-        aRepo.save(alert);
-        List<Alert> alerts = aRepo.findAll();
-        model.addAttribute("alerts",alerts);
-        return "logs";
-    }
-
+    //allows a user to search for a sensor
     @GetMapping("/find/sensor")
     public String findSensor(@ModelAttribute("sensor") Sensor sensor, Model model){
         model.addAttribute("sensor", sensor);
         return "findSensor";
     }
 
+    //validates sensor search
     @PostMapping("/find/sensor/submit")
     public String findSensorByLocation(@ModelAttribute("sensor") Sensor sensor, Model model){
         final String message = "Requested poll is not found";
@@ -446,11 +472,83 @@ public class DumpsterSensorController {
     @GetMapping("/sensor/update/{id}")
     public String getUpdateSensor(@PathVariable(value="id") Long id, Model model){
         Sensor sensor = sRepo.findByID(id);
+        List<Garbage> garbageList = garbageRepo.findAllBySensorID(id);
+        Map<String, Integer> graphData = new TreeMap<>();
+        for (Garbage garbage : garbageList) {
+            graphData.put(garbage.getTime(), garbage.getGarbageLevel());
+        }
+        model.addAttribute("chartData", graphData);
         model.addAttribute("sensor", sensor);
         return "getSensor";
     }
 
+    @PostMapping("/sensor/update/{id}/uninstall")
+    public String getUpdateSensorUninstall(@PathVariable(value="id") Long id){
+        Sensor sensor = sRepo.findByID(id);
+        sensor.setInstalled("false");
+        LocalDateTime now = LocalDateTime.now();
+        sensor.setLastUpdated(now.format(DATE_TIME_FORMATTER));
+        sRepo.save(sensor);
+        return "redirect:/sensor/update/" + id;
+    }
 
+    @PostMapping("/sensor/update/{id}/install")
+    public String getUpdateSensorInstall(@PathVariable(value="id") Long id){
+        Sensor sensor = sRepo.findByID(id);
+        sensor.setInstalled("true");
+        LocalDateTime now = LocalDateTime.now();
+        sensor.setLastUpdated(now.format(DATE_TIME_FORMATTER));
+        sRepo.save(sensor);
+        return "redirect:/sensor/update/" + id;
+    }
 
+    @GetMapping("/sensor/update/{id}/edit")
+    public String getUpdateSensorEdit(@PathVariable(value="id") Long id, Model model){
+        Sensor sensor = sRepo.findByID(id);
+        model.addAttribute("sensor", sensor);
+        return "updateSensor";
+    }
 
+    //validates new sensor
+    @PostMapping("/sensor/update/{id}/edit/confirm")
+    public String editSensor(@PathVariable(value="id") Long id, @ModelAttribute("sensor") Sensor sensor, Model model){
+        Sensor currentSensor = sRepo.findByID(id);
+        Pair<Integer, Model> pair = sensorErrorCounterAndModel(sensor, model, id);
+        if (pair.getFirst() > 0){
+            model.addAttribute(pair.getSecond());
+            return "updateSensor";
+        }
+        currentSensor.setLocation(sensor.getLocation().toLowerCase());
+        currentSensor.setLastUpdated(LocalDateTime.now().format(DATE_TIME_FORMATTER));
+        currentSensor.setTime1(sensor.getTime1());
+        currentSensor.setTime2(sensor.getTime2());
+        sRepo.save(currentSensor);
+        model.addAttribute("sensor", currentSensor);
+        return "redirect:/sensor/update/" + id;
+    }
+
+    @PostMapping("/sensor/update/{id}/delete")
+    public String deleteSensor(@PathVariable(value="id") Long id){
+        sRepo.deleteById(id);
+        return REDIRECT_HOME;
+    }
+
+    @GetMapping("/logs")
+    public String getLogs(Model model){
+        List<Alert> alerts = aRepo.findAll();
+        User user = getLoggedInUser();
+        model.addAttribute("alerts",alerts);
+        model.addAttribute("user", user);
+        return "logs";
+    }
+
+    @PostMapping("/log/{id}/archive")
+    public String archiveLog(@PathVariable(value = "id") Long id, Model model) {
+        Alert alert = aRepo.findByID(id);
+        alert.setArchived(true);
+        aRepo.save(alert);
+        List<Alert> alerts = aRepo.findAll();
+        model.addAttribute("alerts", alerts);
+        return "logs";
+    }
 }

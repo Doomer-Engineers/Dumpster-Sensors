@@ -1,8 +1,6 @@
 package com.dumpster_sensor.webapp.queries;
 
 import com.dumpster_sensor.webapp.models.Alert;
-import com.dumpster_sensor.webapp.models.Sensor;
-import com.dumpster_sensor.webapp.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;

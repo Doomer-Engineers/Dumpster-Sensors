@@ -1,8 +1,10 @@
 package com.dumpster_sensor.webapp.models;
 
+import org.apache.tomcat.jni.Local;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -32,14 +34,12 @@ public class Sensor {
     private String power;
 
     @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-    private java.util.Date lastUpdated;
+    private String lastUpdated;
 
     public Sensor() {
     }
 
-    public Sensor(Long id, String location, String time1, String time2, String installed, String power, Date lastUpdated) {
+    public Sensor(Long id, String location, String time1, String time2, String installed, String power, String lastUpdated) {
         this.id = id;
         this.location = location;
         this.time1 = time1;
@@ -97,11 +97,11 @@ public class Sensor {
         this.power = power;
     }
 
-    public Date getLastUpdated() {
+    public String getLastUpdated() {
         return lastUpdated;
     }
 
-    public void setLastUpdated(Date lastUpdated) {
+    public void setLastUpdated(String lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
 }

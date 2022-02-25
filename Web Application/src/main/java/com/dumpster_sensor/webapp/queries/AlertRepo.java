@@ -8,10 +8,10 @@ public interface AlertRepo extends JpaRepository<Alert,Long> {
 
     //search query for id
     @Query("SELECT a FROM Alert a WHERE a.id = ?1")
-    com.dumpster_sensor.webapp.models.Alert findByID(Long id);
+    Alert findByID(Long id);
 
     //search query for sensor id
     @Query("SELECT a FROM Alert a WHERE a.sensorID = ?1")
-    com.dumpster_sensor.webapp.models.Alert findBySensorID(Long id);
+    Alert findBySensorID(Long id);
 
 }

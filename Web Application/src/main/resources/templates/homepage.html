@@ -61,13 +61,13 @@
                     <tbody>
                     <tr th:each="sensor: ${sensors}">
 
-                        <td> <a th:href="@{'/sensor/update/'+ ${sensor.getId()}}" th:text="${sensor.getId()}"> </a></td>
-                        <td th:text="${sensor.getLocation()}"></td>
-                        <td th:text="${sensor.getPower()}"></td>
-                        <td th:text="${sensor.getTime1()}"></td>
-                        <td th:text="${sensor.getTime2()}"></td>
-                        <td th:text="${sensor.getLastUpdated()}"></td>
-                        <td th:text="${sensor.getInstalled()}"></td>
+                        <td> <a th:href="@{'/sensor/update/'+ ${sensor.id}}" th:text="${sensor.id}"> </a></td>
+                        <td th:text="${sensor.location}"></td>
+                        <td th:text="${sensor.power}"></td>
+                        <td th:text="${sensor.time1}"></td>
+                        <td th:text="${sensor.time2}"></td>
+                        <td th:text="${sensor.lastUpdated}"></td>
+                        <td th:text="${sensor.installed}"></td>
                     </tr>
                     </tbody>
                 </table>
