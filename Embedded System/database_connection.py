@@ -18,36 +18,18 @@ def sendQuery(use_stream=False, query):
         # MicroPython socket objects support stream (aka file) interface
         # directly, but the line below is needed for CPython.
         s = s.makefile("rwb", 0)
-        s.write(b"GET"+constants.PATH_NAME+"HTTP/1.0\r\n\r\n")
+        s.write(b"GET" + constants.PATH_NAME + query + "HTTP/1.0\r\n\r\n")
 #         print(s.read())
     else:
-        s.send(b"GET "+constants.PATH_NAME+" HTTP/1.0\r\n\r\n")
+        s.send(b"GET " + constants.PATH_NAME + query + " HTTP/1.0\r\n\r\n")
 #         print(s.recv(4096))
 
     s.close()
 
 def garbageQuery(garbage_lvl):
-    query = "$sensor_id="+constants.SENSOR_ID+"&garbage_level="+garbage_lvl
+    query = "$sensor_id="+str(constants.SENSOR_ID)+"&garbage_level="+str(garbage_lvl)
     sendQuery(query)
 
 def alertQuery(error):
-    query = "$sensor_id="+constants.SENSOR_ID+"&error="+error
+    query = "$sensor_id="+str(constants.SENSOR_ID)+"&error="+error
     sendQuery(query)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
