@@ -4,3 +4,5 @@ WIFI_PASSWORD = "Wh053Ba1ls?!"
 HOST_NAME = "google.com"
 # PATH_NAME = "/database_connection.php"
 PATH_NAME = "/"
+
+SENSOR_ID = 1

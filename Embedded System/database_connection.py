@@ -4,7 +4,7 @@ except:
     import socket
 import constants
 
-def yeet(use_stream=False):
+def sendQuery(use_stream=False, query):
     s = socket.socket()
 
     ai = socket.getaddrinfo(constants.HOST_NAME, 80)
@@ -19,11 +19,35 @@ def yeet(use_stream=False):
         # directly, but the line below is needed for CPython.
         s = s.makefile("rwb", 0)
         s.write(b"GET"+constants.PATH_NAME+"HTTP/1.0\r\n\r\n")
-        print(s.read())
+#         print(s.read())
     else:
         s.send(b"GET "+constants.PATH_NAME+" HTTP/1.0\r\n\r\n")
-        print(s.recv(4096))
+#         print(s.recv(4096))
 
     s.close()
-    
-yeet()
+
+def garbageQuery(garbage_lvl):
+    query = "$sensor_id="+constants.SENSOR_ID+"&garbage_level="+garbage_lvl
+    sendQuery(query)
+
+def alertQuery(error):
+    query = "$sensor_id="+constants.SENSOR_ID+"&error="+error
+    sendQuery(query)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
