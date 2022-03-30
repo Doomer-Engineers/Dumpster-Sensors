@@ -1,5 +1,5 @@
 from sensor import Sensor
-import database_conection as dbc
+import database_connection as dbc
 
 sensor_1 = Sensor(trigger_pin=17, echo_pin=16, echo_timeout_us=115200)
 sensor_2 = Sensor(trigger_pin=15, echo_pin=14, echo_timeout_us=115200)
