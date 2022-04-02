@@ -27,9 +27,9 @@ def sendQuery(use_stream=False, query):
     s.close()
 
 def garbageQuery(garbage_lvl):
-    query = "$sensor_id="+str(constants.SENSOR_ID)+"&garbage_level="+str(garbage_lvl)
+    query = "?sensor_id="+str(constants.SENSOR_ID)+"&garbage_level="+str(garbage_lvl)
     sendQuery(query)
 
 def alertQuery(error):
-    query = "$sensor_id="+str(constants.SENSOR_ID)+"&error="+error
+    query = "?sensor_id="+str(constants.SENSOR_ID)+"&error="+error
     sendQuery(query)
