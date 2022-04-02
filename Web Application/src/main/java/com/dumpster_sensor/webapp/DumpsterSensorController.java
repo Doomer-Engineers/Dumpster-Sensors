@@ -50,7 +50,7 @@ public class DumpsterSensorController {
     public PasswordValidator pwDto() { return new PasswordValidator(); }
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final String HOME = "homepage";
+    private static final String HOME = "sidebar";
     private static final String REDIRECT_HOME ="redirect:/homepage";
 
     public User getLoggedInUser(){
