@@ -28,7 +28,7 @@ class OTPModelTests {
     @Test
     void whenValidConstructorAndFindByOTP_thenNoError() {
         OTP sett = new OTP(1, "true", 1L);
-        sett.setId(11L);
+        sett.setId(17L);
         entityManager.merge(sett);
         OTP found = oRepo.findByOTP(sett.getOtp());
         Assertions.assertEquals(found.getOtp(), sett.getOtp());
@@ -39,23 +39,9 @@ class OTPModelTests {
     }
 
     @Test
-    void whenValidConstructorAndFindByID_thenNoError() {
-        OTP sett = new OTP(2, "true", 2L);
-        sett.setId(13L);
-        entityManager.merge(sett);
-        OTP found = oRepo.findByID(sett.getId());
-        System.out.println("HEY" + sett.getId());
-        Assertions.assertEquals(found.getOtp(), sett.getOtp());
-        Assertions.assertEquals(found.getExpired(), sett.getExpired());
-        Assertions.assertEquals(found.getId(), sett.getId());
-        Assertions.assertEquals(found.getUserID(), sett.getUserID());
-        entityManager.clear();
-    }
-
-    @Test
     void whenValidConstructorAndFindByUserID_thenNoError() {
         OTP sett = new OTP(3, "true", 3L);
-        sett.setId(12L);
+        sett.setId(18L);
         entityManager.merge(sett);
         OTP found = oRepo.findByUserID(sett.getUserID());
         System.out.println("HEY" + sett.getId());
@@ -67,9 +53,23 @@ class OTPModelTests {
     }
 
     @Test
+    void whenValidConstructorAndFindByID_thenNoError() {
+        OTP sett = new OTP(2, "true", 2L);
+        sett.setId(19L);
+        entityManager.merge(sett);
+        OTP found = oRepo.findByID(sett.getId());
+        System.out.println("HEY" + sett.getId());
+        Assertions.assertEquals(found.getOtp(), sett.getOtp());
+        Assertions.assertEquals(found.getExpired(), sett.getExpired());
+        Assertions.assertEquals(found.getId(), sett.getId());
+        Assertions.assertEquals(found.getUserID(), sett.getUserID());
+        entityManager.clear();
+    }
+
+    @Test
     void whenEmptyConstructor_thenNoError() {
         OTP morde = new OTP();
-        morde.setId(14L);
+        morde.setId(20L);
         morde.setExpired("true");
         morde.setOtp(3);
         morde.setUserID(4L);

@@ -1,5 +1,6 @@
 package com.dumpster_sensor.webapp.queries;
 
+import com.dumpster_sensor.webapp.models.Alert;
 import com.dumpster_sensor.webapp.models.Sensor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,4 +19,8 @@ public interface SensorRepo extends JpaRepository<Sensor,Long> {
     //search query descending last updates
     @Query(value = "SELECT * FROM Sensor s ORDER BY s.last_updated DESC", nativeQuery = true)
     List<Sensor> findAllOrderByLastUpdatedDesc();
+
+    //search for all sensors
+    @Query(value = "SELECT * FROM Sensor s", nativeQuery = true)
+    List<Sensor> findAll();
 }

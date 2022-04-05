@@ -10,6 +10,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
+
 @RunWith(SpringRunner.class)
 @DataJpaTest
 class SensorModelTests {
@@ -20,9 +22,36 @@ class SensorModelTests {
     private SensorRepo sRepo;
 
     @Test
+    void whenValidConstructorAndFindALL_thenNoErrors() {
+        //public Sensor(Long id, String location, String time1, String time2, String installed, String power, String lastUpdated)
+        Sensor sensor = new Sensor(12L, "noneya", "9999", "10000", "true", "low", "Bedtime");
+        Sensor sensor2 = new Sensor(13L, "boo", "99-99", "10:00", "false", "high", "Wakeup");
+
+        entityManager.merge(sensor);
+        entityManager.merge(sensor2);
+        List<Sensor> foundAll = sRepo.findAll();
+        Assertions.assertEquals(foundAll.get(0).getInstalled(), sensor.getInstalled());
+        Assertions.assertEquals(foundAll.get(0).getLocation(), sensor.getLocation());
+        Assertions.assertEquals(foundAll.get(0).getId(), sensor.getId());
+        Assertions.assertEquals(foundAll.get(0).getPower(), sensor.getPower());
+        Assertions.assertEquals(foundAll.get(0).getTime1(), sensor.getTime1());
+        Assertions.assertEquals(foundAll.get(0).getTime2(), sensor.getTime2());
+        Assertions.assertEquals(foundAll.get(0).getLastUpdated(), sensor.getLastUpdated());
+
+        Assertions.assertEquals(foundAll.get(1).getInstalled(), sensor2.getInstalled());
+        Assertions.assertEquals(foundAll.get(1).getLocation(), sensor2.getLocation());
+        Assertions.assertEquals(foundAll.get(1).getId(), sensor2.getId());
+        Assertions.assertEquals(foundAll.get(1).getPower(), sensor2.getPower());
+        Assertions.assertEquals(foundAll.get(1).getTime1(), sensor2.getTime1());
+        Assertions.assertEquals(foundAll.get(1).getTime2(), sensor2.getTime2());
+        Assertions.assertEquals(foundAll.get(1).getLastUpdated(), sensor2.getLastUpdated());
+        entityManager.clear();
+    }
+
+    @Test
     void whenValidConstructorAndFindByID_thenNoErrors() {
         //public Sensor(Long id, String location, String time1, String time2, String installed, String power, String lastUpdated)
-        Sensor sensor = new Sensor(8L, "noneya", "9999", "10000", "true", "low", "Bedtime");
+        Sensor sensor = new Sensor(14L, "noneya", "9999", "10000", "true", "low", "Bedtime");
         entityManager.merge(sensor);
         Sensor found = sRepo.findByID(sensor.getId());
         Assertions.assertEquals(found.getInstalled(), sensor.getInstalled());
@@ -38,7 +67,7 @@ class SensorModelTests {
     @Test
     void whenEmptyConstructor_thenNoErrors() {
         Sensor sensor = new Sensor();
-        sensor.setId(9L);
+        sensor.setId(15L);
         sensor.setLocation("richard");
         sensor.setTime2("5");
         sensor.setTime1("2");
@@ -60,7 +89,7 @@ class SensorModelTests {
     @Test
     void whenValidConstructorAndFindByLocation_thenNoErrors() {
         //public Sensor(Long id, String location, String time1, String time2, String installed, String power, String lastUpdated)
-        Sensor sensor = new Sensor(10L, "noneya", "9999", "10000", "true", "low", "Bedtime");
+        Sensor sensor = new Sensor(16L, "noneya", "9999", "10000", "true", "low", "Bedtime");
         entityManager.merge(sensor);
         Sensor found = sRepo.findByLocation(sensor.getLocation());
         Assertions.assertEquals(found.getInstalled(), sensor.getInstalled());
