@@ -26,10 +26,7 @@ public class OTP {
         this.userID = userID;
     }
 
-    public OTP(int otp, String expired) {
-        this.otp = otp;
-        this.expired = expired;
-    }
+
 
     public OTP() {}
 

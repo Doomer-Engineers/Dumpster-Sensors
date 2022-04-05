@@ -22,7 +22,7 @@ class SensorModelTests {
     @Test
     void whenValidConstructorAndFindByID_thenNoErrors() {
         //public Sensor(Long id, String location, String time1, String time2, String installed, String power, String lastUpdated)
-        Sensor sensor = new Sensor(5L, "noneya", "9999", "10000", "true", "low", "Bedtime");
+        Sensor sensor = new Sensor(8L, "noneya", "9999", "10000", "true", "low", "Bedtime");
         entityManager.merge(sensor);
         Sensor found = sRepo.findByID(sensor.getId());
         Assertions.assertEquals(found.getInstalled(), sensor.getInstalled());
@@ -38,7 +38,7 @@ class SensorModelTests {
     @Test
     void whenEmptyConstructor_thenNoErrors() {
         Sensor sensor = new Sensor();
-        sensor.setId(6L);
+        sensor.setId(9L);
         sensor.setLocation("richard");
         sensor.setTime2("5");
         sensor.setTime1("2");
@@ -60,7 +60,7 @@ class SensorModelTests {
     @Test
     void whenValidConstructorAndFindByLocation_thenNoErrors() {
         //public Sensor(Long id, String location, String time1, String time2, String installed, String power, String lastUpdated)
-        Sensor sensor = new Sensor(7L, "noneya", "9999", "10000", "true", "low", "Bedtime");
+        Sensor sensor = new Sensor(10L, "noneya", "9999", "10000", "true", "low", "Bedtime");
         entityManager.merge(sensor);
         Sensor found = sRepo.findByLocation(sensor.getLocation());
         Assertions.assertEquals(found.getInstalled(), sensor.getInstalled());

@@ -24,7 +24,7 @@ class GarbageModelTests {
     @Test
     void whenEmptyConstructorAndFindByID_thenNoErrors() {
         Garbage league = new Garbage();
-        league.setId(8L);
+        league.setId(15L);
         league.setGarbageLevel(90);
         league.setSensorID(1L);
         league.setTime("HH-MM-SS");
@@ -40,7 +40,7 @@ class GarbageModelTests {
     @Test
     void whenEmptyConstructorAndFindBySensorID_thenNoErrors() {
         Garbage league = new Garbage();
-        league.setId(9L);
+        league.setId(16L);
         league.setGarbageLevel(90);
         league.setSensorID(1L);
         league.setTime("HH-MM-SS");
