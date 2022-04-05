@@ -10,6 +10,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
+
 
 //bootstrap bd on startup
 @RunWith(SpringRunner.class)
@@ -67,8 +69,29 @@ class UserModelTests {
     }
 
     @Test
+    void whenValidConstructorAndFindAll_thenNoErrors() {
+        User bob2 = new User(4L, "general", "bob2", "password2", "bob2@gmail.com");
+        User billy = new User(5L, "admin", "billy", "password23", "billy@gmail.com");
+        entityManager.merge(bob2);
+        entityManager.merge(billy);
+        List<User> foundAll = uRepo.findAll();
+        Assertions.assertEquals(foundAll.get(0).getUsername(), bob2.getUsername());
+        Assertions.assertEquals(foundAll.get(0).getRole(), bob2.getRole());
+        Assertions.assertEquals(foundAll.get(0).getId(), bob2.getId());
+        Assertions.assertEquals(foundAll.get(0).getPassword(), bob2.getPassword());
+        Assertions.assertEquals(foundAll.get(0).getEmail(), bob2.getEmail());
+
+        Assertions.assertEquals(foundAll.get(1).getUsername(), billy.getUsername());
+        Assertions.assertEquals(foundAll.get(1).getRole(), billy.getRole());
+        Assertions.assertEquals(foundAll.get(1).getId(), billy.getId());
+        Assertions.assertEquals(foundAll.get(1).getPassword(), billy.getPassword());
+        Assertions.assertEquals(foundAll.get(1).getEmail(), billy.getEmail());
+        entityManager.clear();
+    }
+
+    @Test
     void whenValidConstructorAndFindByEmail_thenNoErrors() {
-        User bob = new User(4L, "admin", "bob", "password", "bob@gmail.com");
+        User bob = new User(6L, "admin", "bob", "password", "bob@gmail.com");
         entityManager.merge(bob);
         User found = uRepo.findByEmail(bob.getEmail());
         Assertions.assertEquals(found.getUsername(), bob.getUsername());
