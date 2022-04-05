@@ -2,7 +2,6 @@ package com.dumpster_sensor.webapp;
 
 import com.dumpster_sensor.webapp.models.User;
 import com.dumpster_sensor.webapp.queries.UserRepo;
-import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -11,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.List;
 
 //bootstrap bd on startup
 @RunWith(SpringRunner.class)
