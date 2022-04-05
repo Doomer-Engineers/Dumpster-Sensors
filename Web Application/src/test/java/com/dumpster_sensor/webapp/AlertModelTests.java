@@ -25,7 +25,7 @@ class AlertModelTests {
     @Autowired
     private AlertRepo aRepo;
 
-    //testing
+    //testin
     @Test
     void whenValidConstructorsAndFindAll_thenNoErrors() {
         Alert a1 = new Alert(7L, "power", 1L, false);
