@@ -1,7 +1,5 @@
 package com.dumpster_sensor.webapp.models;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
 import javax.persistence.*;
 
 @Entity
