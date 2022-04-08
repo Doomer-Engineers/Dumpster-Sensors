@@ -50,10 +50,10 @@ public class DumpsterSensorController {
     public PasswordValidator pwDto() { return new PasswordValidator(); }
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final String HOME = "sidebar";
+    private static final String HOME = "homepage";
     private static final String REDIRECT_HOME ="redirect:/homepage";
 
-    public User getLoggedInUser(){
+    public static String getLoggedInUser(){
         String username;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) {
@@ -61,7 +61,7 @@ public class DumpsterSensorController {
         } else {
             username = principal.toString();
         }
-        return uRepo.findByUsername(username);
+        return username;
     }
 
     //to send email
@@ -185,7 +185,8 @@ public class DumpsterSensorController {
     // Puts most recent updated sensor to model, up to 5.
     @GetMapping("/homepage")
     public String getHomepage(Model model) {
-        User currentUser = getLoggedInUser();
+        String username = getLoggedInUser();
+        User currentUser = uRepo.findByUsername(username);
         List<Sensor> sensors = sRepo.findAllOrderByLastUpdatedDesc();
 
         if(sensors.size() < 5){
@@ -202,7 +203,8 @@ public class DumpsterSensorController {
     @GetMapping("/addUser")
     public String getAddUser() {
         //restricts role access
-        User currentUser = getLoggedInUser();
+        String username = getLoggedInUser();
+        User currentUser = uRepo.findByUsername(username);
         if (currentUser.getRole().equals("general")){
             return HOME;
         }
@@ -251,7 +253,8 @@ public class DumpsterSensorController {
     //generates a random value not already in the otp table
     @GetMapping("/user/change_password")
     public String getOTP(@ModelAttribute("otp") OTP otp, Model model) {
-        User currentUser = getLoggedInUser();
+        String username = getLoggedInUser();
+        User currentUser = uRepo.findByUsername(username);
 
         Random rand = new Random();
         int upperbound = 10000000;
@@ -292,7 +295,8 @@ public class DumpsterSensorController {
     //returns change password page
     @PostMapping("/user/change_password/otp")
     public String checkOTP(@ModelAttribute("otp") OTP otp, Model model) {
-        User currentUser = getLoggedInUser();
+        String username = getLoggedInUser();
+        User currentUser = uRepo.findByUsername(username);
         LocalDateTime now = LocalDateTime.now();
 
         OTP currentUserOTP = oRepo.findByUserID(currentUser.getId());
@@ -314,7 +318,8 @@ public class DumpsterSensorController {
     //returns change password page
     @GetMapping("/user/change_password/authenticated")
     public String getPasswordChange(Model model){
-        User user = getLoggedInUser();
+        String username = getLoggedInUser();
+        User user = uRepo.findByUsername(username);
         user.setPassword("");
         model.addAttribute("user", user);
         return "updatePassword";
@@ -334,7 +339,8 @@ public class DumpsterSensorController {
         //encodes password as a fixed hash function
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String encodedPassword = encoder.encode(user.getPassword());
-        User currentUser = getLoggedInUser();
+        String username = getLoggedInUser();
+        User currentUser = uRepo.findByUsername(username);
         if(user.getId().equals(currentUser.getId())){
             updatePassword(currentUser, encodedPassword);
             model.addAttribute("currentUser", currentUser);
@@ -353,7 +359,8 @@ public class DumpsterSensorController {
     @GetMapping("/users/update")
     public String getUpdateUsers(Model model) {
         //restricts role access
-        User currentUser = getLoggedInUser();
+        String username = getLoggedInUser();
+        User currentUser = uRepo.findByUsername(username);
         if (currentUser.getRole().equals("general")){
             return HOME;
         }
@@ -536,7 +543,8 @@ public class DumpsterSensorController {
     @GetMapping("/logs")
     public String getLogs(Model model){
         List<Alert> alerts = aRepo.findAll();
-        User user = getLoggedInUser();
+        String username = getLoggedInUser();
+        User user = uRepo.findByUsername(username);
         model.addAttribute("alerts",alerts);
         model.addAttribute("user", user);
         return "logs";
