@@ -176,11 +176,6 @@ public class DumpsterSensorController {
         return "redirect:/login";
     }
 
-    // used during development
-    // need to delete later
-    @GetMapping("/index")
-    public String getIndex() {return "index";}
-
     // Returns homepage
     // Puts most recent updated sensor to model, up to 5.
     @GetMapping("/homepage")
@@ -218,6 +213,7 @@ public class DumpsterSensorController {
 
         //checks to see if entered username is in the system.
         User checkUserValid = uRepo.findByUsername(user.getUsername());
+
         // counter to check for server errors that is not caught client side.
         int errorCounter = 0;
         if(checkUserValid != null){
@@ -463,7 +459,7 @@ public class DumpsterSensorController {
     //validates sensor search
     @PostMapping("/find/sensor/submit")
     public String findSensorByLocation(@ModelAttribute("sensor") Sensor sensor, Model model){
-        final String message = "Requested poll is not found";
+        final String message = "Requested sensor is not found";
         Sensor temp;
         if(sensor.getLocation() != null){
             temp = sRepo.findByLocation(sensor.getLocation());
