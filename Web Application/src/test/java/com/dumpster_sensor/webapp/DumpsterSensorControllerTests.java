@@ -1,7 +1,19 @@
 package com.dumpster_sensor.webapp;
 
 
+
 import com.dumpster_sensor.webapp.models.OTP;
+
+import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.Arrays;
+import java.util.List;
+
+
 import com.dumpster_sensor.webapp.models.User;
 import com.dumpster_sensor.webapp.queries.*;
 import org.junit.Test;
@@ -45,11 +57,7 @@ public class DumpsterSensorControllerTests {
     @MockBean
     private SensorRepo sensorRepo;
 
-    @Test
-    @WithMockUser
-    public void whenValidLogin_thenReturnHomepage()
-            throws Exception {
-        User bob = new User(6L, "admin", "bob", "password", "bob@gmail.com");
+    public void mockUser() {
         Authentication authentication = Mockito.mock(Authentication.class);
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -149,7 +157,14 @@ public class DumpsterSensorControllerTests {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn("bob");
         SecurityContextHolder.setContext(securityContext);
+    }
 
+    @Test
+    @WithMockUser
+    public void whenValidLogin_thenReturnHomepage()
+            throws Exception {
+        User bob = new User(6L, "admin", "bob", "password", "bob@gmail.com");
+        mockUser();
         when(DumpsterSensorController.getLoggedInUser()).thenReturn("bob");
         when(userRepo.findByUsername("user")).thenReturn(bob);
 
@@ -185,5 +200,50 @@ public class DumpsterSensorControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(view().name(("otpPage")))
                 .andExpect(model().attribute("expiredOTP", "Your OTP was expired."));
+    }
+
+    @Test
+    @WithMockUser
+    public void whenValidLogin_thenReturnAddUser()
+            throws Exception {
+        User bob = new User(6L, "admin", "bob", "password", "bob@gmail.com");
+        mockUser();
+        when(DumpsterSensorController.getLoggedInUser()).thenReturn("bob");
+        when(userRepo.findByUsername("user")).thenReturn(bob);
+        mvc.perform(get("/addUser").flashAttr("bob", bob)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(view().name(("addUser")));
+    }
+
+    @Test
+    @WithMockUser
+    public void whenInvalidLogin_thenReturnHomepage()
+            throws Exception {
+        User bob = new User(6L, "general", "bob", "password", "bob@gmail.com");
+        mockUser();
+        when(DumpsterSensorController.getLoggedInUser()).thenReturn("bob");
+        when(userRepo.findByUsername("user")).thenReturn(bob);
+        mvc.perform(get("/addUser").flashAttr("bob", bob)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(view().name(("homepage")));
+    }
+
+    @Test
+    @WithMockUser
+    public void whenValidUserCreation_thenReturnHomepage()
+            throws Exception {
+        User bob = new User(6L, "admin", "bob", "Valid123&", "bob@uiowa.edu");
+        mockUser();
+        PasswordValidator uvp = new PasswordValidator();
+        uvp.setCheckPW(bob.getPassword());
+        when(DumpsterSensorController.getLoggedInUser()).thenReturn("bob");
+        when(userRepo.findByUsername("user")).thenReturn(bob);
+        mvc.perform(post("/addUser").flashAttr("user", bob).flashAttr("uvp", uvp)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(("redirect:/homepage")));
     }
 }

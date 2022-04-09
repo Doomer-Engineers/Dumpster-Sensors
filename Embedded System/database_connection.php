@@ -50,6 +50,11 @@ elseif(isset($_GET["error"]) and
 
     $connection->close();
 }
+elseif(isset($_GET["sensor_id"]) and $_GET["read_sensor"])
+{
+    $read_sensor = $_GET["read_sensor"];
+    $sensor_id = $_GET["sensor_id"];
+}
 else{
     echo "Data is not set in the HTTP request";
 }
