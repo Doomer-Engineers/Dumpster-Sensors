@@ -271,6 +271,7 @@ public class DumpsterSensorController {
         LocalDateTime now = LocalDateTime.now().plusMinutes(5);
 
         OTP temp = oRepo.findByUserID(currentUser.getId());
+
         if (temp == null){
             OTP temp2 = new OTP(otpNum, now.format(DATE_TIME_FORMATTER), currentUser.getId());
             oRepo.save(temp2);
@@ -296,16 +297,19 @@ public class DumpsterSensorController {
     @PostMapping("/user/change_password/otp")
     public String checkOTP(@ModelAttribute("otp") OTP otp, Model model) {
         String username = getLoggedInUser();
+
         User currentUser = uRepo.findByUsername(username);
         LocalDateTime now = LocalDateTime.now();
 
         OTP currentUserOTP = oRepo.findByUserID(currentUser.getId());
-        if (currentUserOTP.getOtp() != otp.getOtp()){
+        if (currentUserOTP ==  null || (currentUserOTP.getOtp() != otp.getOtp())){
             model.addAttribute("wrongOTP", "Your OTP was incorrect.");
             return "otpPage";
         }
 
         LocalDateTime checkDate = LocalDateTime.parse(currentUserOTP.getExpired(),DATE_TIME_FORMATTER);
+        System.out.println(now);
+        System.out.println(checkDate);
 
         if(now.isAfter(checkDate)){
             model.addAttribute("expiredOTP", "Your OTP was expired.");
