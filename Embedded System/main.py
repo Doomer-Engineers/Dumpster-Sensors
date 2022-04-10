@@ -1,7 +1,7 @@
 import constants
 from machine import Pin
 from machine import deepsleep
-from sensor import Sensor
+from hcsr04 import HCSR04
 import database_connection as dbc
 import time
 import network
@@ -15,8 +15,8 @@ def yeet():
 
     maintenance_mode_pin = Pin(10, Pin.IN)
 
-    sensor_1 = Sensor(trigger_pin=17, echo_pin=16, echo_timeout_us=115200)
-    # sensor_2 = Sensor(trigger_pin=15, echo_pin=14, echo_timeout_us=115200)
+    sensor_1 = HCSR04(trigger_pin=17, echo_pin=16, echo_timeout_us=115200)
+    # sensor_2 = HCSR04(trigger_pin=15, echo_pin=14, echo_timeout_us=115200)
 
 
         # If the maintenance pin is down
