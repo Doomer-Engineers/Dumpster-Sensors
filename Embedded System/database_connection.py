@@ -14,3 +14,11 @@ def garbageQuery(garbage_lvl):
 def alertQuery(error):
     query = "?sensor_id="+str(constants.SENSOR_ID)+"&error='"+error+"'"
     sendQuery(query)
+
+def getSensorQuery():
+    query = "?sensor_id="+str(constants.SENSOR_ID)+"&read_sensor=1"
+    return sendQuery(query).split(',')
+
+def powerQuery(power):
+    query = "?sensor_id="+str(constants.SENSOR_ID)+"&power=" + power
+    sendQuery(query)

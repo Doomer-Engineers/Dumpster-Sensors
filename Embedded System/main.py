@@ -21,44 +21,45 @@ def yeet():
 
         # If the maintenance pin is down
     if (maintenance_mode_pin.value()):
-        # Turns sensors on for input
-        relay_pin.value(1)
-        time.sleep(0.5)
-        # Reads in distance in cm from each
-        dist_1 = sensor_1.distance_cm()
-        print("cm=",dist_1)
-    #         dist_2 = sensor_2.distance_cm()
-        # If an negative value is given, the sensors are disconnected
-    #         if (dist_1 < 0 or dist_2 < 0):
-        if (dist_1 < 0):
-            print("Sensor error")
-            dbc.alertQuery("Sensor error")
-        else:
-            # Calculates what percentage of each sid eis full
-            percent_1 = (dist_1 / constants.MAX_DEPTH_CM) * 100
-    #             percent_2 = (dist_2 / constants.MAX_DEPTH_CM) * 100
-    #             # Averages percentages
-    #             avg = (percent_1 + percent_2) / 2
-    #             # writes level to database
-    #             dbc.garbageQuery(avg)
-            dbc.garbageQuery(percent_1)
-            print("%=",percent_1)
-            # If the average level is high enough, send a full alert
-            if (percent_1 > 100):
-                dbc.alertQuery("Full")
-                print("Full")
-            elif(percent_1 > constants.NEAR_FULL_PERCENT):
-                dbc.alertQuery("Near full")
-                print("Near full")
+        if (bool(dbc.getSensorQuery[?] == 'True'):
+            # Turns sensors on for input
+            relay_pin.value(1)
+            time.sleep(0.5)
+            # Reads in distance in cm from each
+            dist_1 = sensor_1.distance_cm()
+            print("cm=",dist_1)
+        #         dist_2 = sensor_2.distance_cm()
+            # If an negative value is given, the sensors are disconnected
+        #         if (dist_1 < 0 or dist_2 < 0):
+            if (dist_1 < 0):
+                print("Sensor error")
+                dbc.alertQuery("Sensor error")
             else:
-                print("Not full")
-        # Turns sensors off
-        relay_pin.value(0)
+                # Calculates what percentage of each sid eis full
+                percent_1 = (dist_1 / constants.MAX_DEPTH_CM) * 100
+        #             percent_2 = (dist_2 / constants.MAX_DEPTH_CM) * 100
+        #             # Averages percentages
+        #             avg = (percent_1 + percent_2) / 2
+        #             # writes level to database
+        #             dbc.garbageQuery(avg)
+                dbc.garbageQuery(percent_1)
+                print("%=",percent_1)
+                # If the average level is high enough, send a full alert
+                if (percent_1 > 100):
+                    dbc.alertQuery("Full")
+                    print("Full")
+                elif(percent_1 > constants.NEAR_FULL_PERCENT):
+                    dbc.alertQuery("Near full")
+                    print("Near full")
+                else:
+                    print("Not full")
+            # Turns sensors off
+            relay_pin.value(0)
 
-        """ TODO: Battery level code """
+            """ TODO: Battery level code """
 
-        # Puts code into deepsleep
-    #         deepsleep(60000 * constants.DEEPSLEEP_TIME_MIN)
+            # Puts code into deepsleep
+        #         deepsleep(60000 * constants.DEEPSLEEP_TIME_MIN)
 
 
 station = network.WLAN(network.STA_IF)
