@@ -71,10 +71,10 @@ elseif(isset($_GET["sensor_id"]) and
         while($row = $result->fetch_assoc()) {
             // Returns in order
             // id, installed, power, time1, time2
-            echo $row["id"]. "," . $row["installed"]. "," . $row["power"]. "," . $row["time1"]. "," . $row["time2"]. "<br>";
+            echo $row["id"]. "," . $row["installed"]. "," . $row["power"]. "," . $row["time1"]. "," . $row["time2"];
         }
     } else {
-        echo "0 results";
+        echo "0 results, false";
     }
 
 }
