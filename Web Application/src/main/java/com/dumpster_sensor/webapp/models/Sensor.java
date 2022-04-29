@@ -1,11 +1,6 @@
 package com.dumpster_sensor.webapp.models;
 
-import org.apache.tomcat.jni.Local;
-import org.springframework.format.annotation.DateTimeFormat;
-
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table(name = "sensor")
