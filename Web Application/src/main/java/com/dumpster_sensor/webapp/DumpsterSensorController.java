@@ -67,18 +67,19 @@ public class DumpsterSensorController {
     //to send email
     public void sendEmail(String email, String subject, String body){
         //Sender's email ID needs to be mentioned.
-        String from = "doomerengineers@gmail.com";
+        String from = "doomerengineers@outlook.com";
 
         //Assuming you are sending email from through gmail smtp.
-        String host = "smtp.gmail.com";
+        String host = "smtp-mail.outlook.com";
 
         //Get system properties.
         Properties properties = System.getProperties();
 
         //Setup mail server
         properties.put("mail.smtp.host", host);
-        properties.put("mail.smtp.port", "465");
-        properties.put("mail.smtp.ssl.enable", "true");
+        properties.put("mail.smtp.port", "587");
+        properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.ssl.enable", "false");
         properties.put("mail.smtp.auth", "true");
 
         //Get the Session object.// and pass username and password.
@@ -87,14 +88,14 @@ public class DumpsterSensorController {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
 
-                return new PasswordAuthentication("doomerengineers@gmail.com", "Taco9876");
+                return new PasswordAuthentication("doomerengineers@outlook.com", "Tacomaster123");
 
             }
 
         });
 
         //Used to debug SMTP issues.
-        session.setDebug(true);
+        //session.setDebug(true);
 
         try {
             //Create a default MimeMessage object.
@@ -377,7 +378,10 @@ public class DumpsterSensorController {
         uRepo.deleteById(id);
         List<User> users = uRepo.findAll();
         model.addAttribute("users", users);
-        return "updateUsersAdmin";
+        String username = getLoggedInUser();
+        User currentUser = uRepo.findByUsername(username);
+        model.addAttribute("currentUser", currentUser);
+        return "redirect:/users/update";
     }
 
     //allows an admin to reset a password
@@ -416,7 +420,7 @@ public class DumpsterSensorController {
         List<User> users = uRepo.findAll();
         model.addAttribute("users", users);
         model.addAttribute("currentUser", getLoggedInUser());
-        return "updateUsersAdmin";
+        return "redirect:/users/update";
     }
 
     //gets add sensor page
@@ -557,6 +561,6 @@ public class DumpsterSensorController {
         aRepo.save(alert);
         List<Alert> alerts = aRepo.findAll();
         model.addAttribute("alerts", alerts);
-        return "logs";
+        return "redirect:/logs";
     }
 }
