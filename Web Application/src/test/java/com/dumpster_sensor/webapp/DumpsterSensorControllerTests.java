@@ -392,12 +392,12 @@ public class DumpsterSensorControllerTests {
 
     @Test
     @WithMockUser
-    public void whenDeleteUser_ThenReturnUsersAdmin() throws Exception {
+    public void whenDeleteUser_ThenRedirectsUsersAdmin() throws Exception {
         User bob = new User(6L, "admin", "bob", "Valid$123", "bob@uiowa.edu");
         mvc.perform(post("/user/{id}/delete", bob.getId()).with(csrf()).flashAttr("user", bob)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(view().name(("updateUsersAdmin")));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(("redirect:/users/update")));
     }
 
     @Test
@@ -424,14 +424,14 @@ public class DumpsterSensorControllerTests {
 
     @Test
     @WithMockUser
-    public void whenValidUpdatedUser_ThenReturnUpdateUsersAdmin() throws Exception {
+    public void whenValidUpdatedUser_ThenRedirectUpdateUsersAdmin() throws Exception {
         User bob = new User(6L, "admin", "bob", "Valid$123", "bob@uiowa.edu");
         when(userRepo.findByID(bob.getId())).thenReturn(bob);
 
         mvc.perform(post("/user/{id}/update", bob.getId()).with(csrf()).flashAttr("user", bob)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(view().name(("updateUsersAdmin")));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(("redirect:/users/update")));
     }
 
     @Test
@@ -711,9 +711,8 @@ public class DumpsterSensorControllerTests {
 
         mvc.perform(post("/log/{id}/archive",alert.getId() ).with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(view().name("logs"))
-                .andExpect(model().attribute("alerts", alerts));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/logs"));
     }
 
 }

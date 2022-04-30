@@ -73,16 +73,16 @@ body {
 <div class="container-fluid text-center">
     <div id="mySidenav" class="sidenav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <h3><a th:href="@{/find/sensor}">Find Sensor</a></h3>
-        <h3><a th:href="@{/addSensor}">Add Sensor</a></h3>
-        <h3><a th:href="@{/view/sensors}">View Sensors</a></h3>
-        <h3><a th:href="@{/logs}">View Alerts</a></h3>
-        <div th:if="${user.getRole() == 'admin'}">
-            <h3><a th:href="@{/addUser}">Add User</a></h3>
-            <h3><a th:href="@{/users/update}">Update Users</a></h3>
+        <h3 id="start-find-sensor"><a id="find-sensor" th:href="@{/find/sensor}">Find Sensor</a></h3>
+        <h3 id="start-add-sensor"><a id="add-sensor" th:href="@{/addSensor}">Add Sensor</a></h3>
+        <h3 id="start-view-sensors"><a id ="view-sensors" th:href="@{/view/sensors}">View Sensors</a></h3>
+        <h3 id = "start-logs"><a id = "logs" th:href="@{/logs}">View Alerts</a></h3>
+        <div id="role" th:if="${user.getRole() == 'admin'}">
+            <h3 id="start-add-user"><a id="add-user" th:href="@{/addUser}">Add User</a></h3>
+            <h3 id="start-update-users"><a id="update-users" th:href="@{/users/update}">Update Users</a></h3>
         </div>
-        <h3><a th:href="@{/user/change_password}">Change Password</a></h3>
-        <h3><a th:href="@{/logout}">Logout</a></h3>
+        <h3 id="start-change-password"><a id="change-password" th:href="@{/user/change_password}">Change Password</a></h3>
+        <h3 id ="start-logout"><a id = "logout" th:href="@{/logout}">Logout</a></h3>
     </div>
 </div>
         <div id="main" class="col-10">
