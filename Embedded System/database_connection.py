@@ -20,5 +20,5 @@ def getSensorQuery():
     return sendQuery(query).split(',')
 
 def powerQuery(power):
-    query = "?sensor_id="+str(constants.SENSOR_ID)+"&power=" + power
+    query = "?sensor_id="+str(constants.SENSOR_ID)+"&power=" + str(power)
     sendQuery(query)
