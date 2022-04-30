@@ -1,8 +1,8 @@
 <?php
-$servername = "207.191.214.21:3306";
-$username = "any";
-$password = "password";
-$database_name = "dumpster_sensors";
+$servername = "please-work.coolgukfuz6j.us-east-2.rds.amazonaws.com:3306";
+$username = "admin";
+$password = "Tacomaster123";
+$database_name = "dumpster-sensors2022.coolgukfuz6j.us-east-2.rds.amazonaws.com";
 
 if(isset($_GET["garbage_level"]) and
     isset($_GET["sensor_id"]))
@@ -91,7 +91,7 @@ elseif(isset($_GET["sensor_id"]) and
         die("MySQL connection failed: " . $connection->connect_error);
     }
 
-    $sql = "UPDATE sensor SET power=$power WHERE id=$sensor_id";
+    $sql = "UPDATE sensor SET power=$power, last_updated=now() WHERE id=$sensor_id";
 
     if ($connection->query($sql) === TRUE) {
         echo "Record updated successfully";
