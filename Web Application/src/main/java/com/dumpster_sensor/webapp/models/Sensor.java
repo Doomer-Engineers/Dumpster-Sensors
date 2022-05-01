@@ -15,12 +15,6 @@ public class Sensor {
     @Column(nullable = false, length = 45)
     private String location;
 
-    @Column(nullable = false)
-    private String time1;
-
-    @Column(nullable = false)
-    private String time2;
-
     @Column(nullable = false, length = 45)
     private String installed;
 
@@ -34,11 +28,9 @@ public class Sensor {
     public Sensor() {
     }
 
-    public Sensor(Long id, String location, String time1, String time2, String installed, String power, String lastUpdated) {
+    public Sensor(Long id, String location, String installed, String power, String lastUpdated) {
         this.id = id;
         this.location = location;
-        this.time1 = time1;
-        this.time2 = time2;
         this.installed = installed;
         this.power = power;
         this.lastUpdated = lastUpdated;
@@ -58,22 +50,6 @@ public class Sensor {
 
     public void setLocation(String location) {
         this.location = location;
-    }
-
-    public String getTime1() {
-        return time1;
-    }
-
-    public void setTime1(String time1) {
-        this.time1 = time1;
-    }
-
-    public String getTime2() {
-        return time2;
-    }
-
-    public void setTime2(String time2) {
-        this.time2 = time2;
     }
 
     public String getInstalled() {

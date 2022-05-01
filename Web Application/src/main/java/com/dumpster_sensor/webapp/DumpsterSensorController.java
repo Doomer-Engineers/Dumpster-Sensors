@@ -136,26 +136,13 @@ public class DumpsterSensorController {
 
     private  Pair<Integer, Model> sensorErrorCounterAndModel(@ModelAttribute("sensor") Sensor sensor, Model model, Long id) {
         int errors = 0;
-        if (sensor.getTime1().equals(sensor.getTime2())) {
-            model.addAttribute("timeErrorE", "The two selected times cannot be equal");
-            errors++;
-        }
 
         List<Sensor> sensors = sRepo.findAll();
         for (Sensor value : sensors) {
-            if (!value.getId().equals(id)) {
-                if (value.getTime1().equals(sensor.getTime1()) || value.getTime2().equals(sensor.getTime1())) {
-                    model.addAttribute("timeError1", "Selected time is currently in use");
-                    errors++;
-                }
-                if (value.getTime1().equals(sensor.getTime2()) || value.getTime2().equals(sensor.getTime2())) {
-                    model.addAttribute("timeError2", "Selected time is currently in use");
-                    errors++;
-                }
-                if (value.getLocation().equalsIgnoreCase(sensor.getLocation())) {
-                    model.addAttribute("locationError", "Location is already in use");
-                    errors++;
-                }
+            if (!value.getId().equals(id) && (value.getLocation().equalsIgnoreCase(sensor.getLocation()))) {
+
+                model.addAttribute("locationError", "Location is already in use");
+                errors++;
             }
         }
         return Pair.of(errors, model);
@@ -167,6 +154,19 @@ public class DumpsterSensorController {
         String subject = "Your Dumpster Sensor Password has been updated";
         String message = "Your password has been updated.\nPlease contact an admin if this was not you.\n\nThank You,\nDoomer Engineers";
         sendEmail(user.getEmail(),subject, message);
+    }
+
+    private void serviceErrorCheck(Sensor sensor){
+
+        LocalDateTime now = LocalDateTime.now().minusDays(1);
+        LocalDateTime checkDate = LocalDateTime.parse(sensor.getLastUpdated(),DATE_TIME_FORMATTER);
+        if (!now.isBefore(checkDate)){
+            Alert alert = new Alert();
+            alert.setError("Sensor has not been serviced in the last hour");
+            alert.setSensorID(sensor.getId());
+            aRepo.save(alert);
+        }
+
     }
 
     //Processes GET and POST requests
@@ -184,6 +184,13 @@ public class DumpsterSensorController {
         String username = getLoggedInUser();
         User currentUser = uRepo.findByUsername(username);
         List<Sensor> sensors = sRepo.findAllOrderByLastUpdatedDesc();
+        List<Sensor> checkSensors = sRepo.findAll();
+
+        for (Sensor checkSensor : checkSensors) {
+            if(checkSensor.getLastUpdated() != null) {
+                serviceErrorCheck(checkSensor);
+            }
+        }
 
         if(sensors.size() < 5){
             model.addAttribute("sensors", sensors.subList(0, sensors.size()));
@@ -305,8 +312,6 @@ public class DumpsterSensorController {
         }
 
         LocalDateTime checkDate = LocalDateTime.parse(currentUserOTP.getExpired(),DATE_TIME_FORMATTER);
-        System.out.println(now);
-        System.out.println(checkDate);
 
         if(now.isAfter(checkDate)){
             model.addAttribute("expiredOTP", "Your OTP was expired.");
@@ -483,6 +488,9 @@ public class DumpsterSensorController {
     @GetMapping("/sensor/update/{id}")
     public String getUpdateSensor(@PathVariable(value="id") Long id, Model model){
         Sensor sensor = sRepo.findByID(id);
+        if (sensor.getLastUpdated() != null){
+            serviceErrorCheck(sensor);
+        }
         List<Garbage> garbageList = garbageRepo.findAllBySensorID(id);
         Map<String, Integer> graphData = new TreeMap<>();
         for (Garbage garbage : garbageList) {
@@ -531,8 +539,6 @@ public class DumpsterSensorController {
         }
         currentSensor.setLocation(sensor.getLocation().toLowerCase());
         currentSensor.setLastUpdated(LocalDateTime.now().format(DATE_TIME_FORMATTER));
-        currentSensor.setTime1(sensor.getTime1());
-        currentSensor.setTime2(sensor.getTime2());
         sRepo.save(currentSensor);
         model.addAttribute("sensor", currentSensor);
         return "redirect:/sensor/update/" + id;

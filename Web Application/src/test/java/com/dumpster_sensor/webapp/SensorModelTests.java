@@ -24,8 +24,8 @@ class SensorModelTests {
     @Test
     void whenValidConstructorAndFindALL_thenNoErrors() {
         //public Sensor(Long id, String location, String time1, String time2, String installed, String power, String lastUpdated)
-        Sensor sensor = new Sensor(12L, "noneya", "9999", "10000", "true", "low", "Bedtime");
-        Sensor sensor2 = new Sensor(13L, "boo", "99-99", "10:00", "false", "high", "Wakeup");
+        Sensor sensor = new Sensor(12L, "noneya", "true", "low", "Bedtime");
+        Sensor sensor2 = new Sensor(13L, "boo", "false", "high", "Wakeup");
 
         entityManager.merge(sensor);
         entityManager.merge(sensor2);
@@ -34,16 +34,12 @@ class SensorModelTests {
         Assertions.assertEquals(foundAll.get(0).getLocation(), sensor.getLocation());
         Assertions.assertEquals(foundAll.get(0).getId(), sensor.getId());
         Assertions.assertEquals(foundAll.get(0).getPower(), sensor.getPower());
-        Assertions.assertEquals(foundAll.get(0).getTime1(), sensor.getTime1());
-        Assertions.assertEquals(foundAll.get(0).getTime2(), sensor.getTime2());
         Assertions.assertEquals(foundAll.get(0).getLastUpdated(), sensor.getLastUpdated());
 
         Assertions.assertEquals(foundAll.get(1).getInstalled(), sensor2.getInstalled());
         Assertions.assertEquals(foundAll.get(1).getLocation(), sensor2.getLocation());
         Assertions.assertEquals(foundAll.get(1).getId(), sensor2.getId());
         Assertions.assertEquals(foundAll.get(1).getPower(), sensor2.getPower());
-        Assertions.assertEquals(foundAll.get(1).getTime1(), sensor2.getTime1());
-        Assertions.assertEquals(foundAll.get(1).getTime2(), sensor2.getTime2());
         Assertions.assertEquals(foundAll.get(1).getLastUpdated(), sensor2.getLastUpdated());
         entityManager.clear();
     }
@@ -51,15 +47,13 @@ class SensorModelTests {
     @Test
     void whenValidConstructorAndFindByID_thenNoErrors() {
         //public Sensor(Long id, String location, String time1, String time2, String installed, String power, String lastUpdated)
-        Sensor sensor = new Sensor(14L, "noneya", "9999", "10000", "true", "low", "Bedtime");
+        Sensor sensor = new Sensor(14L, "noneya", "true", "low", "Bedtime");
         entityManager.merge(sensor);
         Sensor found = sRepo.findByID(sensor.getId());
         Assertions.assertEquals(found.getInstalled(), sensor.getInstalled());
         Assertions.assertEquals(found.getLocation(), sensor.getLocation());
         Assertions.assertEquals(found.getId(), sensor.getId());
         Assertions.assertEquals(found.getPower(), sensor.getPower());
-        Assertions.assertEquals(found.getTime1(), sensor.getTime1());
-        Assertions.assertEquals(found.getTime2(), sensor.getTime2());
         Assertions.assertEquals(found.getLastUpdated(), sensor.getLastUpdated());
         entityManager.clear();
     }
@@ -69,8 +63,6 @@ class SensorModelTests {
         Sensor sensor = new Sensor();
         sensor.setId(15L);
         sensor.setLocation("richard");
-        sensor.setTime2("5");
-        sensor.setTime1("2");
         sensor.setInstalled("true");
         sensor.setPower("high");
         sensor.setLastUpdated("noon");
@@ -80,8 +72,6 @@ class SensorModelTests {
         Assertions.assertEquals(found.getLocation(), sensor.getLocation());
         Assertions.assertEquals(found.getId(), sensor.getId());
         Assertions.assertEquals(found.getPower(), sensor.getPower());
-        Assertions.assertEquals(found.getTime1(), sensor.getTime1());
-        Assertions.assertEquals(found.getTime2(), sensor.getTime2());
         Assertions.assertEquals(found.getLastUpdated(), sensor.getLastUpdated());
         entityManager.clear();
     }
@@ -89,15 +79,13 @@ class SensorModelTests {
     @Test
     void whenValidConstructorAndFindByLocation_thenNoErrors() {
         //public Sensor(Long id, String location, String time1, String time2, String installed, String power, String lastUpdated)
-        Sensor sensor = new Sensor(16L, "noneya", "9999", "10000", "true", "low", "Bedtime");
+        Sensor sensor = new Sensor(16L, "noneya", "true", "low", "Bedtime");
         entityManager.merge(sensor);
         Sensor found = sRepo.findByLocation(sensor.getLocation());
         Assertions.assertEquals(found.getInstalled(), sensor.getInstalled());
         Assertions.assertEquals(found.getLocation(), sensor.getLocation());
         Assertions.assertEquals(found.getId(), sensor.getId());
         Assertions.assertEquals(found.getPower(), sensor.getPower());
-        Assertions.assertEquals(found.getTime1(), sensor.getTime1());
-        Assertions.assertEquals(found.getTime2(), sensor.getTime2());
         Assertions.assertEquals(found.getLastUpdated(), sensor.getLastUpdated());
         entityManager.clear();
     }
