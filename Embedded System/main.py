@@ -24,12 +24,12 @@ def run():
         # Reads in distance in cm from each
         dist_1 = sensor_1.distance_cm()
         dist_2 = sensor_2.distance_cm()
-        print("dist_1 cm=",dist_1)
-        print("dist_2 cm=",dist_2)
+#         print("dist_1 cm=",dist_1)
+#         print("dist_2 cm=",dist_2)
     #         dist_2 = sensor_2.distance_cm()
         # If an negative value is given, the sensors are disconnected
         if (dist_1 < 0 or dist_2 < 0):
-            print("Sensor error 1")
+#             print("Sensor error 1")
             dbc.alertQuery("SE")
         else:
             # Calculates what percentage of each sid eis full
@@ -38,19 +38,19 @@ def run():
             # Averages percentages
             avg = (percent_1 + percent_2) / 2
             dbc.garbageQuery(avg)
-            print("%=",avg)
+#             print("%=",avg)
             # If the average level is high enough, send a full alert
             if (avg > 100):
                 dbc.alertQuery("F")
-                print("Full")
+#                 print("Full")
             elif(avg > constants.NEAR_FULL_PERCENT):
                 dbc.alertQuery("NF")
-                print("NearFull")
+#                 print("NearFull")
             elif(percent_1 < 0 or percent_2 < 0):
-                print("SensorError2")
+#                 print("SensorError2")
                 dbc.alertQuery("SE")
-            else:
-                print("Not full")
+#             else:
+#                 print("Not full")
         # Turns sensors off
         relay_pin.value(0)
 
@@ -58,7 +58,7 @@ def run():
         battery_pin = ADC(Pin(34))
         battery_pin.atten(ADC.ATTN_11DB)       #Full range: 3.3v
         volts = round((battery_pin.read()*constants.BATTERY_MULT)/1000,2)
-        print("volts=",volts)
+#         print("volts=",volts)
         dbc.powerQuery(volts)
         if(volts < 3):
             dbc.alertQuery("LP")
@@ -74,7 +74,7 @@ station.connect(constants.WIFI_ESSID, constants.WIFI_PASSWORD)
 maintenance_mode_pin = Pin(35, Pin.IN)
 
 if (not maintenance_mode_pin.value()):
-    print("running main loop")
+#     print("running main loop")
     run()
-else:
-    print("No main loop")
+# else:
+#     print("No main loop")

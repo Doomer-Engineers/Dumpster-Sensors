@@ -2,7 +2,7 @@
 $servername = "please-work.coolgukfuz6j.us-east-2.rds.amazonaws.com:3306";
 $username = "admin";
 $password = "Tacomaster123";
-$database_name = "dumpster-sensors2022.coolgukfuz6j.us-east-2.rds.amazonaws.com";
+$database_name = "dumpster_sensors";
 
 if(isset($_GET["garbage_level"]) and
     isset($_GET["sensor_id"]))
