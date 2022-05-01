@@ -17,7 +17,7 @@ def run():
 
         # If the maintenance pin is down
     time.sleep(4)
-    if (station.active() and dbc.getSensorQuery()[1] == 'true'):
+    if (station.active()):
         # Turns sensors on for input
         relay_pin.value(1)
         time.sleep(0.5)
@@ -37,38 +37,35 @@ def run():
             percent_2 = ((constants.MAX_DEPTH_CM - dist_2) / constants.MAX_DEPTH_CM) * 100
             # Averages percentages
             avg = (percent_1 + percent_2) / 2
-            dbc.garbageQuery(avg)
-#             print("%=",avg)
             # If the average level is high enough, send a full alert
             if (avg > 100):
                 dbc.alertQuery("F")
-#                 print("Full")
+                dbc.garbageQuery(avg)
             elif(avg > constants.NEAR_FULL_PERCENT):
                 dbc.alertQuery("NF")
-#                 print("NearFull")
             elif(percent_1 < 0 or percent_2 < 0):
-#                 print("SensorError2")
-                dbc.alertQuery("SE")
-#             else:
-#                 print("Not full")
+                dbc.garbageQuery(100)
+                dbc.alertQuery("F")
         # Turns sensors off
         relay_pin.value(0)
 
-        """ TODO: Battery level code """
+        """ Battery level code """
         battery_pin = ADC(Pin(34))
         battery_pin.atten(ADC.ATTN_11DB)       #Full range: 3.3v
         volts = round((battery_pin.read()*constants.BATTERY_MULT)/1000,2)
-#         print("volts=",volts)
-        dbc.powerQuery(volts)
         if(volts < 3):
             dbc.alertQuery("LP")
-
+            dbc.powerQuery("LOW")
+        elif(volts < 3.3):
+            dbc.powerQuery("MID")
+        else:
+            dbc.powerQuery("FULL")
         # Puts code into deepsleep
         #deepsleep(60000 * constants.DEEPSLEEP_TIME_MIN)
         deepsleep(5000)
 
 station = network.WLAN(network.STA_IF)
-print(station.active(True))
+station.active(True)
 station.connect(constants.WIFI_ESSID, constants.WIFI_PASSWORD)
 
 maintenance_mode_pin = Pin(35, Pin.IN)
