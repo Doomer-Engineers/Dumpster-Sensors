@@ -17,7 +17,7 @@ def run():
 
         # If the maintenance pin is down
     time.sleep(4)
-    if (station.active()):
+    if (station.active() and dbc.getSensorQuery()[1] == 'true'):
         # Turns sensors on for input
         relay_pin.value(1)
         time.sleep(0.5)
@@ -71,7 +71,4 @@ station.connect(constants.WIFI_ESSID, constants.WIFI_PASSWORD)
 maintenance_mode_pin = Pin(35, Pin.IN)
 
 if (not maintenance_mode_pin.value()):
-#     print("running main loop")
     run()
-# else:
-#     print("No main loop")
