@@ -1,4 +1,4 @@
-package com.dumpster_sensor.webapp;
+package cucumber;
 
 import com.dumpster_sensor.webapp.models.Alert;
 import com.dumpster_sensor.webapp.models.User;

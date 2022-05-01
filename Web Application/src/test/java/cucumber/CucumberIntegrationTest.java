@@ -1,4 +1,4 @@
-package com.dumpster_sensor.webapp;
+package cucumber;
 
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;

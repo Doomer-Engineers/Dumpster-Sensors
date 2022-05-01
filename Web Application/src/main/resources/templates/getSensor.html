@@ -13,8 +13,6 @@
                 <p th:text="'Location: ' + ${sensor.getLocation()}"></p>
                 <p th:text="'Last Updated: ' + ${sensor.getLastUpdated()}"></p>
                 <p th:text="'Power Level: ' + ${sensor.getPower()}"></p>
-                <p th:text="'Time 1: ' + ${sensor.getTime1()}"></p>
-                <p th:text="'Time 2: ' + ${sensor.getTime2()}"></p>
                 <div class="row">
                     <div class="px-3 ml-3">
                         <form th:action="@{'/sensor/update/' + ${sensor.id} +'/edit'}" method="get">

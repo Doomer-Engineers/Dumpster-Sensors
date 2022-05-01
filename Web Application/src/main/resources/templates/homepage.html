@@ -116,8 +116,6 @@ body {
                         <th>ID</th>
                         <th>Location</th>
                         <th>Power Level</th>
-                        <th>Time 1</th>
-                        <th>Time 2</th>
                         <th>Last Updated</th>
                         <th>Installed</th>
                     </tr>
@@ -128,8 +126,6 @@ body {
                         <td> <a th:href="@{'/sensor/update/'+ ${sensor.id}}" th:text="${sensor.id}"> </a></td>
                         <td th:text="${sensor.location}"></td>
                         <td th:text="${sensor.power}"></td>
-                        <td th:text="${sensor.time1}"></td>
-                        <td th:text="${sensor.time2}"></td>
                         <td th:text="${sensor.lastUpdated}"></td>
                         <td th:text="${sensor.installed}"></td>
                     </tr>
