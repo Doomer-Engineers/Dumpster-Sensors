@@ -187,7 +187,7 @@ public class DumpsterSensorController {
         List<Sensor> checkSensors = sRepo.findAll();
 
         for (Sensor checkSensor : checkSensors) {
-            if(checkSensor.getLastUpdated() != null) {
+            if(checkSensor.getLastUpdated() != null && checkSensor.getInstalled().equals("true")) {
                 serviceErrorCheck(checkSensor);
             }
         }
@@ -488,7 +488,7 @@ public class DumpsterSensorController {
     @GetMapping("/sensor/update/{id}")
     public String getUpdateSensor(@PathVariable(value="id") Long id, Model model){
         Sensor sensor = sRepo.findByID(id);
-        if (sensor.getLastUpdated() != null){
+        if (sensor.getLastUpdated() != null && sensor.getInstalled().equals("true")){
             serviceErrorCheck(sensor);
         }
         List<Garbage> garbageList = garbageRepo.findAllBySensorID(id);
