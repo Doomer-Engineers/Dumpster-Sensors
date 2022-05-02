@@ -17,50 +17,64 @@ def run():
 
         # If the maintenance pin is down
     time.sleep(4)
-    if (station.active() and dbc.getSensorQuery()[1] == 'true'):
-        # Turns sensors on for input
-        relay_pin.value(1)
-        time.sleep(0.5)
-        # Reads in distance in cm from each
-        dist_1 = sensor_1.distance_cm()
-        dist_2 = sensor_2.distance_cm()
-#         print("dist_1 cm=",dist_1)
-#         print("dist_2 cm=",dist_2)
-    #         dist_2 = sensor_2.distance_cm()
-        # If an negative value is given, the sensors are disconnected
-        if (dist_1 < 0 or dist_2 < 0):
-#             print("Sensor error 1")
-            dbc.alertQuery("SE")
-        else:
-            # Calculates what percentage of each sid eis full
-            percent_1 = ((constants.MAX_DEPTH_CM - dist_1) / constants.MAX_DEPTH_CM) * 100
-            percent_2 = ((constants.MAX_DEPTH_CM - dist_2) / constants.MAX_DEPTH_CM) * 100
-            # Averages percentages
-            avg = (percent_1 + percent_2) / 2
-            # If the average level is high enough, send a full alert
-            if (avg > 100):
-                dbc.alertQuery("F")
-                dbc.garbageQuery(avg)
-            elif(avg > constants.NEAR_FULL_PERCENT):
-                dbc.alertQuery("NF")
-            elif(percent_1 < 0 or percent_2 < 0):
-                dbc.garbageQuery(100)
-                dbc.alertQuery("F")
-        # Turns sensors off
-        relay_pin.value(0)
+    try:
+        if (station.active()):
+            # Turns sensors on for input
+            relay_pin.value(1)
+            time.sleep(0.5)
+            # Reads in distance in cm from each
+            dist_1 = sensor_1.distance_cm()
+            dist_2 = sensor_2.distance_cm()
+            print("dist_1 cm=",dist_1)
+            print("dist_2 cm=",dist_2)
+            # If an negative value is given, the sensors are disconnected
+            if (dist_1 < 0 or dist_2 < 0):
+    #             print("Sensor error 1")
+                dbc.alertQuery("SE")
+            else:
+                # Calculates what percentage of each sid eis full
+                percent_1 = constants.DIST_PERCENT_CONVERSION(dist_1)
+                percent_2 = constants.DIST_PERCENT_CONVERSION(dist_2)
+                # Averages percentages
+                avg = (percent_1 + percent_2) / 2
+                print("percent_1",percent_1)
+                print("percent_2",percent_2)
+                print("avg",avg)
+                # If the average level is high enough, send a full alert
+                if (avg > 100):
+                    dbc.alertQuery("F")
+                    print("F")
+                    dbc.garbageQuery(100)
+                elif(avg > constants.NEAR_FULL_PERCENT):
+                    dbc.alertQuery("NF")
+                    dbc.garbageQuery(avg)
+                    print("NF")
+                elif(percent_1 < 0 or percent_2 < 0):
+                    dbc.garbageQuery(100)
+                    dbc.alertQuery("F")
+                    print("F by error")
+                else:
+                    dbc.garbageQuery(avg)
+            # Turns sensors off
+            relay_pin.value(0)
 
-        """ Battery level code """
-        battery_pin = ADC(Pin(34))
-        battery_pin.atten(ADC.ATTN_11DB)       #Full range: 3.3v
-        volts = round((battery_pin.read()*constants.BATTERY_MULT)/1000,2)
-        if(volts < 3):
-            dbc.alertQuery("LP")
-            dbc.powerQuery("LOW")
-        elif(volts < 3.3):
-            dbc.powerQuery("MID")
-        else:
-            dbc.powerQuery("FULL")
-        # Puts code into deepsleep
+            """ Battery level code """
+            battery_pin = ADC(Pin(34))
+            battery_pin.atten(ADC.ATTN_11DB)       #Full range: 3.3v
+            volts = round((battery_pin.read()*constants.BATTERY_MULT)/1000,2)
+            print(volts)
+            if(volts < 3):
+                dbc.alertQuery("LP")
+                dbc.powerQuery("LOW")
+                #print("LOW")
+            elif(volts < 3.3):
+                dbc.powerQuery("MID")
+                #print("MID")
+            else:
+                dbc.powerQuery("FULL")
+                #print("FULL")
+            # Puts code into deepsleep
+    finally:
         #deepsleep(60000 * constants.DEEPSLEEP_TIME_MIN)
         deepsleep(5000)
 
