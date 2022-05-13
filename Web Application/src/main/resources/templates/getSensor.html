@@ -14,23 +14,23 @@
                 <p th:text="'Last Updated: ' + ${sensor.getLastUpdated()}"></p>
                 <p th:text="'Power Level: ' + ${sensor.getPower()}"></p>
                 <div class="row">
-                    <div class="px-3 ml-3">
-                        <form th:action="@{'/sensor/update/' + ${sensor.id} +'/edit'}" method="get">
+                    <div id="editDiv" class="ml-3 px-3">
+                        <form id = "edit" th:action="@{'/sensor/update/' + ${sensor.id} +'/edit'}" method="get">
                             <button type="submit" class="btn btn-warning">Update</button>
                         </form>
                     </div>
-                    <div th:if="${sensor.getInstalled() == 'false'}" class="px-3">
-                        <form th:action="@{'/sensor/update/' + ${sensor.id} +'/install'}" method="post">
+                    <div id = "installDiv" th:if="${sensor.getInstalled() == 'false'}" class="px-3">
+                        <form id = "install" th:action="@{'/sensor/update/' + ${sensor.id} +'/install'}" method="post">
                             <button type="submit" class="btn btn-primary">Install</button>
                         </form>
                     </div>
-                    <div th:if="${sensor.getInstalled() == 'true'}" class="px-3">
-                        <form th:action="@{'/sensor/update/' + ${sensor.id} +'/uninstall'}" method="post">
+                    <div id = "uninstallDiv" th:if="${sensor.getInstalled() == 'true'}" class="px-3">
+                        <form id="uninstall" th:action="@{'/sensor/update/' + ${sensor.id} +'/uninstall'}" method="post">
                             <button type="submit" class="btn btn-primary">Uninstall</button>
                         </form>
                     </div>
-                    <div class="px-3 ml-3">
-                        <form th:action="@{'/sensor/update/' + ${sensor.id} +'/delete'}" method="post">
+                    <div id= "deleteDiv" class="ml-3 px-3">
+                        <form id = "delete" th:action="@{'/sensor/update/' + ${sensor.id} +'/delete'}" method="post">
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
                     </div>

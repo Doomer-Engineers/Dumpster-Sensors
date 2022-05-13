@@ -1,8 +1,10 @@
-package cucumber;
+package com.dumpster_sensor.webapp;
 
 import com.dumpster_sensor.webapp.models.Alert;
+import com.dumpster_sensor.webapp.models.Sensor;
 import com.dumpster_sensor.webapp.models.User;
 import com.dumpster_sensor.webapp.queries.AlertRepo;
+import com.dumpster_sensor.webapp.queries.SensorRepo;
 import com.dumpster_sensor.webapp.queries.UserRepo;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
@@ -18,6 +20,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Sleeper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -34,6 +37,9 @@ public class MyStepdefs{
 
     @Autowired
     private AlertRepo aRepo;
+
+    @Autowired
+    private SensorRepo sRepo;
 
 
     @Before
@@ -113,7 +119,7 @@ public class MyStepdefs{
 
     @And("with user account with username of {string} and password {string}")
     public void withUserAccountWithUsernameOfAndPassword(String username, String password) {
-        User user = new User(1000L, "admin", username, password, "testing@uiowa.edu");
+        User user = new User(1000L, "admin", username, password, "brenden-taul@uiowa.edu");
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String encodedPassword = encoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
@@ -150,5 +156,111 @@ public class MyStepdefs{
                 btn.click();
             }
         }
+    }
+
+    @When("the user finds by {string} sensor {string}")
+    public void theUserFindsBySensor(String func, String value) {
+        WebElement container = driver.findElement(By.className("container"));
+        WebElement form = container.findElement(By.id(func+"Form"));
+        WebElement div = form.findElement(By.id(func+"Div"));
+        WebElement div2 = div.findElement(By.className("pr-3"));
+        WebElement input = div2.findElement(By.className("form-control"));
+        input.sendKeys(value);
+        WebElement confirmDiv = div.findElement(By.id(func+"Confirm"));
+        WebElement button = confirmDiv.findElement(By.className("btn"));
+        button.click();
+    }
+
+    @And("sensor is added")
+    public void sensorIsAdded() {
+        Sensor sensor = new Sensor(1L,"cutest", "false", null, null);
+        sRepo.save(sensor);
+    }
+
+    @When("the user {string} sensor")
+    public void theUserInstallsUninstallsSensor(String func) {
+        WebElement container = driver.findElement(By.className("container-fluid"));
+        WebElement group = container.findElement(By.className("form-group"));
+        WebElement col = group.findElement(By.className("col-3"));
+        WebElement border = col.findElement(By.className("border"));
+        WebElement row = border.findElement(By.className("row"));
+        WebElement div = row.findElement(By.id(func+"Div"));
+        WebElement form  = div.findElement(By.id(func));
+        WebElement button = form.findElement(By.className("btn"));
+        button.click();
+    }
+
+    @When("the user updates sensor location with {string}")
+    public void theUserUpdatesSensorLocationWith(String value) {
+        WebElement container = driver.findElement(By.className("container"));
+        WebElement form = container.findElement(By.id("form"));
+        WebElement div = form.findElement(By.className("m-3"));
+        WebElement div2 = div.findElement(By.id("update"));
+        WebElement label = div2.findElement(By.className("col-form-label"));
+        WebElement input = label.findElement(By.className("form-control"));
+        input.sendKeys(value);
+        WebElement div3 = div.findElement(By.id("button"));
+        WebElement button = div3.findElement(By.className("btn"));
+        button.click();
+    }
+
+    @When("the user adds a new {string} sensor at {string}")
+    public void theUserAddsANewSensorAt(String isInstalled, String location) {
+        WebElement container = driver.findElement(By.className("container"));
+        WebElement form = container.findElement(By.id("form"));
+        WebElement div = form.findElement(By.className("m-3"));
+        WebElement div2 = div.findElement(By.id("locDiv"));
+        WebElement label = div2.findElement(By.className("col-form-label"));
+        WebElement input = label.findElement(By.className("form-control"));
+        input.sendKeys(location);
+
+        WebElement div3 = div.findElement(By.id("isInstalled"));
+        WebElement div4 = div3.findElement(By.id("yes"));
+        WebElement radio = div4.findElement(By.id("true"));
+        radio.click();
+
+        WebElement div5 = div.findElement(By.id("submit"));
+        WebElement button = div5.findElement(By.className("btn"));
+        button.click();
+    }
+
+    @When("the user adds a new user with username {string}, password {string}, role {string}, and email {string}")
+    public void theUserAddsANewUserWithUsernamePasswordRoleAndEmail(String username, String password, String role, String email) {
+        WebElement container = driver.findElement(By.className("container"));
+        WebElement form = container.findElement(By.id("form"));
+        WebElement ud = form.findElement(By.id("usernameDiv"));
+        WebElement ud2 = ud.findElement(By.id("usernameDiv2"));
+        WebElement ul2 = ud2.findElement(By.id("usernameLabel"));
+        WebElement usernameInput = ul2.findElement(By.className("form-control"));
+        usernameInput.sendKeys(username);
+
+        WebElement ed = form.findElement(By.id("emailDiv"));
+        WebElement ed2 = ed.findElement(By.id("emailDiv2"));
+        WebElement el2 = ed2.findElement(By.id("emailLabel"));
+        WebElement emailInput = el2.findElement(By.className("form-control"));
+        emailInput.sendKeys(email);
+
+        WebElement pd = form.findElement(By.id("passwordDiv"));
+        WebElement pd2 = pd.findElement(By.id("passwordDiv2"));
+        WebElement pl2 = pd2.findElement(By.id("passwordLabel"));
+        WebElement passwordInput = pl2.findElement(By.className("form-control"));
+        passwordInput.sendKeys(password);
+
+        WebElement cd = form.findElement(By.id("checkDiv"));
+        WebElement cd2 = cd.findElement(By.id("checkDiv2"));
+        WebElement cl2 = cd2.findElement(By.id("checkLabel"));
+        WebElement checkInput = cl2.findElement(By.className("form-control"));
+        checkInput.sendKeys(password);
+
+        WebElement rd = form.findElement(By.id("roleDiv"));
+        WebElement rd2 = rd.findElement(By.id("roleDiv2"));
+        WebElement rl2 = rd2.findElement(By.id("roleLabel"));
+        WebElement roleInput = rl2.findElement(By.className("form-control"));
+        Select selectObject = new Select(roleInput);
+        selectObject.selectByValue(role);
+
+        WebElement div = form.findElement(By.id("submit"));
+        WebElement button = div.findElement(By.className("btn"));
+        button.click();
     }
 }

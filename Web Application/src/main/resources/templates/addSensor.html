@@ -7,7 +7,7 @@
 </head>
 <body class="p-3 mb-2 bg-dark text-white">
     <div class="container text-center">
-        <form th:action="@{/addSensor}" method="post" th:object="${sensor}"
+        <form id = "form" th:action="@{/addSensor}" method="post" th:object="${sensor}"
               style="max-width: 800px; margin: 0 auto;">
             <div class="m-3">
                 <div class="form-group row">
@@ -18,17 +18,16 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group row pl-5">
-                    <label class="col-form-label col-4">Location</label>
-                    <label>
+                <div id = "locDiv" class="form-group row pl-5">
+                    <label class="col-form-label col-4">Location
                         <input type="text" class="form-control" th:field="*{location}" required/>
                     </label>
                 </div>
-                <div class="form-group row pl-5">
+                <div id = "isInstalled" class="form-group row pl-5">
                     <div class="mr-4 pr-5">
                         <p>Is the sensor already installed?</p>
                     </div>
-                    <div class="mr-4 pr-5">
+                    <div id="yes" class="mr-4 pr-5">
                         <input type="radio" id="true" name="installed" value="true" th:field="*{installed}" required>
                         <label for="true">Yes</label><br>
                     </div>
@@ -38,7 +37,7 @@
                     </div>
                 </div>
 
-                <div>
+                <div id="submit">
                     <button type="submit" class="btn btn-primary">Add Sensor</button>
                 </div>
             </div>
