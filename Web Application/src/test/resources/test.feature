@@ -122,3 +122,94 @@ Feature: the web application works
     And the user is on the "/homepage"
     When the user clicks link "logout"
     Then the user is on page with title "Confirm Log Out?"
+
+  Scenario: user makes call to GET /update/sensor by location
+    Given the user is on the "/login"
+    And the user has "username" of "Cucumber"
+    And the user has "password" of "@Ren1474"
+    And the user clicks "submit" with class "btn"
+    And sensor is added
+    And the user is on the "/find/sensor"
+    When the user finds by "location" sensor "cuTest"
+    Then the user is on page with title "Find Sensor"
+
+  Scenario: user makes call to GET /sensor/update by id
+    Given the user is on the "/login"
+    And the user has "username" of "Cucumber"
+    And the user has "password" of "@Ren1474"
+    And the user clicks "submit" with class "btn"
+    And the user is on the "/find/sensor"
+    When the user finds by "id" sensor "1"
+    Then the user is on page with title "Find Sensor"
+
+  Scenario: user makes call to GET /update/sensor/install
+    Given the user is on the "/login"
+    And the user has "username" of "Cucumber"
+    And the user has "password" of "@Ren1474"
+    And the user clicks "submit" with class "btn"
+    And the user is on the "/sensor/update/3"
+    When the user "install" sensor
+    Then the user is on page with title "Find Sensor"
+
+  Scenario: user makes call to GET /update/sensor/uninstall
+    Given the user is on the "/login"
+    And the user has "username" of "Cucumber"
+    And the user has "password" of "@Ren1474"
+    And the user clicks "submit" with class "btn"
+    And the user is on the "/sensor/update/3"
+    When the user "uninstall" sensor
+    Then the user is on page with title "Find Sensor"
+
+  Scenario: user makes call to GET /update/sensor/edit
+    Given the user is on the "/login"
+    And the user has "username" of "Cucumber"
+    And the user has "password" of "@Ren1474"
+    And the user clicks "submit" with class "btn"
+    And the user is on the "/sensor/update/3"
+    When the user "edit" sensor
+    Then the user is on page with title "Update Sensor"
+
+  Scenario: user makes call to GET /update/sensor/edit to change location
+    Given the user is on the "/login"
+    And the user has "username" of "Cucumber"
+    And the user has "password" of "@Ren1474"
+    And the user clicks "submit" with class "btn"
+    And the user is on the "/sensor/update/3/edit"
+    When the user updates sensor location with "changeLoc"
+    Then the user is on page with title "Find Sensor"
+
+  Scenario: user makes call to GET /update/sensor/delete
+    Given the user is on the "/login"
+    And the user has "username" of "Cucumber"
+    And the user has "password" of "@Ren1474"
+    And the user clicks "submit" with class "btn"
+    And the user is on the "/sensor/update/3"
+    When the user "delete" sensor
+    Then the user is on page with title "Homepage"
+
+  Scenario: user makes call to GET /addSensor to add a new sensor
+    Given the user is on the "/login"
+    And the user has "username" of "Cucumber"
+    And the user has "password" of "@Ren1474"
+    And the user clicks "submit" with class "btn"
+    And the user is on the "/addSensor"
+    When the user adds a new "installed" sensor at "midwest"
+    Then the user is on page with title "Homepage"
+
+  Scenario: user makes call to GET /addUser to add a new valid user
+    Given the user is on the "/login"
+    And the user has "username" of "Cucumber"
+    And the user has "password" of "@Ren1474"
+    And the user clicks "submit" with class "btn"
+    And the user is on the "/addUser"
+    When the user adds a new user with username "new", password "@Ren1474", role "admin", and email "brenden-taul@uiowa.edu"
+    Then the user is on page with title "Homepage"
+
+  Scenario: user makes call to GET /users/update
+    Given the user is on the "/login"
+    And the user has "username" of "Cucumber"
+    And the user has "password" of "@Ren1474"
+    And the user clicks "submit" with class "btn"
+    And the user is on the "/users/update"
+    When the user clicks button "recover" on page "update users"
+    Then the user is on page with title "Homepage"
